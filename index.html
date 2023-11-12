@@ -2,6 +2,20 @@
 <html>
 <head>
     <title>Simple Editable Text Website</title>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyBKtqcRTqmwOn758IA3nOGIRzV7Qk_kG2Q",
+            authDomain: "automation-f208d.firebaseapp.com",
+            databaseURL: "https://automation-f208d-default-rtdb.firebaseio.com",
+            projectId: "automation-f208d",
+            storageBucket: "automation-f208d.appspot.com",
+            messagingSenderId: "861003739122",
+            appId: "1:861003739122:web:0866a42e4bbcc36d54056b"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
 </head>
 <body>
     <div contenteditable="true" id="editableText">
@@ -11,14 +25,15 @@
     <button onclick="saveText()">Save</button>
 
     <script>
-        // Check if there's saved text
-        if(localStorage.getItem("text")) {
-            document.getElementById("editableText").innerHTML = localStorage.getItem("text");
-        }
+        var db = firebase.database();
+        var ref = db.ref('text');
+        ref.on('value', function(snapshot) {
+            document.getElementById("editableText").innerHTML = snapshot.val();
+        });
 
         function saveText() {
             var text = document.getElementById("editableText").innerHTML;
-            localStorage.setItem("text", text);
+            ref.set(text);
         }
     </script>
 </body>
