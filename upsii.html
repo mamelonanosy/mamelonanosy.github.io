@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Editable Text Website</title>
+</head>
+<body>
+    <div contenteditable="true" id="editableText">
+        This is an editable text. Click here to edit.
+    </div>
+
+    <button onclick="saveText()">Save</button>
+
+    <script>
+        // Check if there's saved text
+        if(localStorage.getItem("text")) {
+            document.getElementById("editableText").innerHTML = localStorage.getItem("text");
+        }
+
+        function saveText() {
+            var text = document.getElementById("editableText").innerHTML;
+            localStorage.setItem("text", text);
+        }
+    </script>
+</body>
+</html>
