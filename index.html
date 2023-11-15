@@ -4,6 +4,29 @@
     <title>Simple Editable Text Website</title>
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <style>
+        #toast {
+            visibility: hidden;
+            max-width: 50%;
+            height: auto;
+            margin: auto;
+            position: fixed;
+            top: 0; bottom: 0;
+            left: 0; right: 0;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            z-index: 1;
+            transition: visibility 0s 2s, opacity 0.5s linear;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            transition: visibility 0s 0s, opacity 0.5s linear;
+        }
+    </style>
     <script>
         var firebaseConfig = {
             apiKey: "AIzaSyBKtqcRTqmwOn758IA3nOGIRzV7Qk_kG2Q",
@@ -24,6 +47,8 @@
 
     <button onclick="saveText()">Save</button>
 
+    <div id="toast">Save successfully changed</div>
+
     <script>
         var db = firebase.database();
         var ref = db.ref('text');
@@ -33,7 +58,15 @@
 
         function saveText() {
             var text = document.getElementById("editableText").innerHTML;
-            ref.set(text);
+            ref.set(text).then(function() {
+                showToast();
+            });
+        }
+
+        function showToast() {
+            var toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 2000);
         }
     </script>
 </body>
