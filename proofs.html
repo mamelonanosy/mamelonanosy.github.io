@@ -91,7 +91,7 @@
             vProofButton.style.display = "none"; 
             vProofButton.onclick = function() { 
                 if (!button.parentNode.getElementsByClassName('v_proof').length) {
-                    addSubgroup(ref, button.parentNode, 'v_proof'); 
+                    addSubgroup(ref, button.parentNode, 'v_proof');
                 } else {
                     alert('Only one v_proof subgroup is allowed per group.');
                 }
@@ -138,6 +138,21 @@
             if (prefix === 'proof') {
                 proofCounter++;
             }
+        }
+    }
+
+    function editGroup(button, ref) {
+        var newName = prompt("Please enter the new group name:");
+        if (newName != null) {
+            ref.set(newName);
+            button.innerHTML = newName;
+        }
+    }
+
+    function deleteGroup(group, ref) {
+        if (confirm("Are you sure you want to delete this group?")) {
+            ref.remove();
+            group.parentNode.removeChild(group);
         }
     }
 </script>
