@@ -5,15 +5,13 @@
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
     <style>
-        /* Add styles for the container */
         .container {
-            display: flex; /* Make the children align horizontally */
-            flex-direction: column; /* Make the children stack vertically */
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Add styles for the button */
         .group {
-            margin-bottom: 10px; /* Add some space between the groups */
+            margin-bottom: 10px;
         }
     </style>
     <script>
@@ -38,6 +36,7 @@
 
 <script>
     var db = firebase.database();
+    var proofCounter = 0;
 
 function addGroup(button) {
     var groupName = prompt("Please enter the group name:");
@@ -101,7 +100,7 @@ function addSubgroup(ref, group, prefix) {
     if (strings != null) {
         var stringsArray = strings.split('\n');
         var subgroupCount = group.getElementsByClassName('subgroup').length;
-        var subgroupName = prefix === 'proof' ? prefix + '_' + (subgroupCount + 1) : prefix;
+        var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
         var subgroupRef = ref.child(subgroupName);
         stringsArray.forEach(function(string, index) {
             subgroupRef.child(index.toString()).set(string);
@@ -111,6 +110,10 @@ function addSubgroup(ref, group, prefix) {
         subgroupDiv.className = "subgroup " + prefix;
         subgroupDiv.innerHTML = subgroupName + ": " + stringsArray.join(', ');
         group.appendChild(subgroupDiv);
+
+        if (prefix === 'proof') {
+            proofCounter++;
+        }
     }
 }
 </script>
