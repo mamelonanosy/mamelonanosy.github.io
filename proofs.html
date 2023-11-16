@@ -56,20 +56,11 @@ function addGroup(button) {
         deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
         button.parentNode.appendChild(deleteButton);
 
-        var groupContainer = document.getElementById("groupContainer");
-        var newGroup = document.createElement("div");
-        newGroup.className = "group";
-        var newButton = document.createElement("button");
-        newButton.innerHTML = "Add Group";
-        newButton.onclick = function() { addGroup(newButton); };
-        newGroup.appendChild(newButton);
-        groupContainer.appendChild(newGroup);
-
         var subgroupButton = document.createElement("button");
         subgroupButton.innerHTML = "Add proof";
         subgroupButton.style.display = "none"; 
         subgroupButton.onclick = function() { addSubgroup(ref, button.parentNode, 'proof'); };
-        newGroup.appendChild(subgroupButton);
+        button.parentNode.appendChild(subgroupButton);
 
         var vProofButton = document.createElement("button");
         vProofButton.innerHTML = "Add v_proof";
@@ -81,7 +72,16 @@ function addGroup(button) {
                 alert('Only one v_proof subgroup is allowed per group.');
             }
         };
-        newGroup.appendChild(vProofButton);
+        button.parentNode.appendChild(vProofButton);
+
+        var groupContainer = document.getElementById("groupContainer");
+        var newGroup = document.createElement("div");
+        newGroup.className = "group";
+        var newButton = document.createElement("button");
+        newButton.innerHTML = "Add Group";
+        newButton.onclick = function() { addGroup(newButton); };
+        newGroup.appendChild(newButton);
+        groupContainer.appendChild(newGroup);
 
         button.onclick = function() {
             if (subgroupButton.style.display === "none") {
