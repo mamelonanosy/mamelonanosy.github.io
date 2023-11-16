@@ -156,48 +156,17 @@
             };
         }
     }
-function addStringControls(stringDiv, ref, stringKey) {
-    var editButton = document.createElement("button");
-    editButton.innerHTML = "✏️";
-    editButton.onclick = function() { editString(ref, stringKey, stringDiv); };
-    stringDiv.appendChild(editButton);
 
-    var deleteButton = document.createElement("button");
-    deleteButton.innerHTML = "❌";
-    deleteButton.onclick = function() { deleteString(ref, stringDiv); };
-    stringDiv.appendChild(deleteButton);
-}
-
-// Add this function to edit a string
-function editString(ref, stringKey, stringDiv) {
-    var newString = prompt("Please enter the new string:");
-    if (newString != null) {
-        ref.child(stringKey).set(newString);
-        stringDiv.firstChild.nodeValue = newString;
-    }
-}
-
-// Add this function to delete a string
-function deleteString(ref, stringDiv) {
-    if (confirm("Are you sure you want to delete this string?")) {
-        ref.remove();
-        stringDiv.parentNode.removeChild(stringDiv);
-    }
-}
-function addSubgroup(ref, group, prefix) {
-    var strings = prompt("Please enter the list of strings separated by newlines:");
-    if (strings != null) {
-        var stringsArray = strings.split('\n');
-        var subgroupCount = group.getElementsByClassName('subgroup').length;
-        var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
-        var subgroupRef = ref.child(subgroupName);
-        stringsArray.forEach(function(string, index) {
-            subgroupRef.child(index.toString()).set(string);
-            var stringDiv = document.createElement("div");
-            stringDiv.innerHTML = string;
-            addStringControls(stringDiv, subgroupRef.child(index.toString()), index.toString());
-            subgroupDiv.appendChild(stringDiv);
-        });
+    function addSubgroup(ref, group, prefix) {
+        var strings = prompt("Please enter the list of strings separated by newlines:");
+        if (strings != null) {
+            var stringsArray = strings.split('\n');
+            var subgroupCount = group.getElementsByClassName('subgroup').length;
+            var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
+            var subgroupRef = ref.child(subgroupName);
+            stringsArray.forEach(function(string, index) {
+                subgroupRef.child(index.toString()).set(string);
+            });
 
             var subgroupDiv = document.createElement("div");
             subgroupDiv.className = "subgroup " + prefix;
