@@ -57,20 +57,6 @@ function addGroup(button) {
         deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
         button.parentNode.appendChild(deleteButton);
 
-        var subgroupButton = document.createElement("button");
-        subgroupButton.innerHTML = "Add strings";
-        subgroupButton.style.display = "none"; 
-        subgroupButton.onclick = function() { addSubgroup(ref, button.parentNode); };
-        button.parentNode.appendChild(subgroupButton);
-
-        button.onclick = function() {
-            if (subgroupButton.style.display === "none") {
-                subgroupButton.style.display = "block";
-            } else {
-                subgroupButton.style.display = "none";
-            }
-        };
-
         var groupContainer = document.getElementById("groupContainer");
         var newGroup = document.createElement("div");
         newGroup.className = "group";
@@ -79,22 +65,50 @@ function addGroup(button) {
         newButton.onclick = function() { addGroup(newButton); };
         newGroup.appendChild(newButton);
         groupContainer.appendChild(newGroup);
+
+        var subgroupButton = document.createElement("button");
+        subgroupButton.innerHTML = "Add proof";
+        subgroupButton.style.display = "none"; 
+        subgroupButton.onclick = function() { addSubgroup(ref, button.parentNode, 'proof'); };
+        newGroup.appendChild(subgroupButton);
+
+        var vProofButton = document.createElement("button");
+        vProofButton.innerHTML = "Add v_proof";
+        vProofButton.style.display = "none"; 
+        vProofButton.onclick = function() { 
+            if (!button.parentNode.getElementsByClassName('v_proof').length) {
+                addSubgroup(ref, button.parentNode, 'v_proof'); 
+            } else {
+                alert('Only one v_proof subgroup is allowed per group.');
+            }
+        };
+        newGroup.appendChild(vProofButton);
+
+        button.onclick = function() {
+            if (subgroupButton.style.display === "none") {
+                subgroupButton.style.display = "block";
+                vProofButton.style.display = "block";
+            } else {
+                subgroupButton.style.display = "none";
+                vProofButton.style.display = "none";
+            }
+        };
     }
 }
 
-function addSubgroup(ref, group) {
+function addSubgroup(ref, group, prefix) {
     var strings = prompt("Please enter the list of strings separated by newlines:");
     if (strings != null) {
         var stringsArray = strings.split('\n');
         var subgroupCount = group.getElementsByClassName('subgroup').length;
-        var subgroupName = 'proof_' + (subgroupCount + 1);
+        var subgroupName = prefix === 'proof' ? prefix + '_' + (subgroupCount + 1) : prefix;
         var subgroupRef = ref.child(subgroupName);
         stringsArray.forEach(function(string, index) {
             subgroupRef.child(index.toString()).set(string);
         });
 
         var subgroupDiv = document.createElement("div");
-        subgroupDiv.className = "subgroup";
+        subgroupDiv.className = "subgroup " + prefix;
         subgroupDiv.innerHTML = subgroupName + ": " + stringsArray.join(', ');
         group.appendChild(subgroupDiv);
     }
