@@ -1,3 +1,8 @@
+I see what you mean. It seems like the "Save" button is appearing below the text area. This could be due to the default behavior of block-level elements in HTML, which take up the full width available and stack vertically. 
+
+To fix this, you can wrap the text area and the "Save" button in a container and apply `display: flex;` to it. This will make them align horizontally. Here's how you can modify your code:
+
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,14 +17,14 @@
             font-size: 20px;
         }
 
-        /* Add styles for the button and text area */
-        #editableText, #saveButton {
-            display: inline-block; /* Make them inline elements */
-            vertical-align: top; /* Align them to the top */
+        /* Add styles for the container */
+        .container {
+            display: flex; /* Make the children align horizontally */
         }
 
-        #saveButton {
-            margin-left: 10px; /* Add some space between the text area and the button */
+        /* Add styles for the button and text area */
+        #editableText, #saveButton {
+            margin-right: 10px; /* Add some space between the text area and the button */
         }
     </style>
     <script>
@@ -36,12 +41,14 @@
     </script>
 </head>
 <body>
-    <div contenteditable="true" id="editableText">
-        This is an editable text. Click here to edit.
-    </div>
+    <div class="container">
+        <div contenteditable="true" id="editableText">
+            This is an editable text. Click here to edit.
+        </div>
 
-    <button onclick="saveText()" id="saveButton">Save</button>
-    <span class="checkmark" id="checkmark">✔️</span>
+        <button onclick="saveText()" id="saveButton">Save</button>
+        <span class="checkmark" id="checkmark">✔️</span>
+    </div>
 
     <script>
         var db = firebase.database();
@@ -74,3 +81,9 @@
     </script>
 </body>
 </html>
+```
+This code will move the "Save" button to the right side of the text area and change the checkmark color to green. Please replace your Firebase configuration and database reference as needed. Remember to always keep your Firebase configuration secure to prevent unauthorized access. Let me know if you need help with anything else! 😊
+
+Source : conversation avec Bing, 16/11/2023
+(1) github.com. https://github.com/longnt2607/wogomin/tree/c8284fa88cde394bc12cb9457bb097c8f8597310/mvc%2Fuser%2Fviews%2Fincludes%2FpayByCard.php.
+(2) github.com. https://github.com/abohanzala/said/tree/dd8aa1b83d7eb0e2544860cf13b0abcc6266f11e/adm%2Fmod%2Fc_user%2Fcompany%2Fviews%2Forder.php.
