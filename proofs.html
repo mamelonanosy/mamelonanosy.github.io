@@ -61,7 +61,7 @@
 
                 var editButton = document.createElement("button");
                 editButton.innerHTML = "Edit";
-                editButton.onclick = function() { editGroup(groupButton, ref.child(childKey)); };
+                editButton.onclick = function() { editGroup(groupButton, ref.child(childKey), groupDiv); };
                 groupDiv.appendChild(editButton);
 
                 var deleteButton = document.createElement("button");
@@ -110,7 +110,7 @@
 
             var editButton = document.createElement("button");
             editButton.innerHTML = "Edit";
-            editButton.onclick = function() { editGroup(button, ref); };
+            editButton.onclick = function() { editGroup(button, ref, button.parentNode); };
             button.parentNode.appendChild(editButton);
 
             var deleteButton = document.createElement("button");
@@ -179,11 +179,28 @@
         }
     }
 
-    function editGroup(button, ref) {
+    function editGroup(button, ref, group) {
         var newName = prompt("Please enter the new group name:");
         if (newName != null) {
-            ref.set(newName);
-            button.innerHTML = newName;
+            var newRef = ref.parent.child(newName);
+            ref.once('value', function(snapshot) {
+                newRef.set(snapshot.val(), function(error) {
+                    if (!error) {
+                        ref.remove();
+                        button.innerHTML = newName;
+                        button.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { editGroup(button, newRef, group); };
+                        button.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { deleteGroup(group, newRef); };
+                        button.nextSibling.nextSibling.onclick = function() { addSubgroup(newRef, group, 'proof'); };
+                        button.nextSibling.nextSibling.nextSibling.onclick = function() { 
+                            if (!group.getElementsByClassName('v_proof').length) {
+                                addSubgroup(newRef, group, 'v_proof');
+                            } else {
+                                alert('Only one v_proof subgroup is allowed per group.');
+                            }
+                        };
+                    }
+                });
+            });
         }
     }
 
