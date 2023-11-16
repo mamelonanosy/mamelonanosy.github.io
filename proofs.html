@@ -13,10 +13,6 @@
         .group {
             margin-bottom: 10px;
         }
-
-        .subgroup {
-            display: none;
-        }
     </style>
     <script>
         var firebaseConfig = {
@@ -57,20 +53,9 @@
                 childSnapshot.forEach(function(subgroupSnapshot) {
                     var subgroupKey = subgroupSnapshot.key;
                     var subgroupData = subgroupSnapshot.val();
-                    var subgroupButton = document.createElement("button");
-                    subgroupButton.innerHTML = subgroupKey;
-                    subgroupButton.onclick = function() {
-                        var subgroupDiv = this.nextSibling;
-                        if (subgroupDiv.style.display === "none") {
-                            subgroupDiv.style.display = "block";
-                        } else {
-                            subgroupDiv.style.display = "none";
-                        }
-                    };
-                    groupDiv.appendChild(subgroupButton);
                     var subgroupDiv = document.createElement("div");
                     subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'v_proof');
-                    subgroupDiv.innerHTML = Object.values(subgroupData).join('<br>');
+                    subgroupDiv.innerHTML = subgroupKey + ": " + Object.values(subgroupData).join(', ');
                     groupDiv.appendChild(subgroupDiv);
                 });
 
@@ -183,20 +168,9 @@
                 subgroupRef.child(index.toString()).set(string);
             });
 
-            var subgroupButton = document.createElement("button");
-            subgroupButton.innerHTML = subgroupName;
-            subgroupButton.onclick = function() {
-                var subgroupDiv = this.nextSibling;
-                if (subgroupDiv.style.display === "none") {
-                    subgroupDiv.style.display = "block";
-                } else {
-                    subgroupDiv.style.display = "none";
-                }
-            };
-            group.appendChild(subgroupButton);
             var subgroupDiv = document.createElement("div");
             subgroupDiv.className = "subgroup " + prefix;
-            subgroupDiv.innerHTML = stringsArray.join('<br>');
+            subgroupDiv.innerHTML = subgroupName + ": " + stringsArray.join(', ');
             group.appendChild(subgroupDiv);
 
             if (prefix === 'proof') {
