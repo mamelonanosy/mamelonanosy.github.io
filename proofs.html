@@ -55,7 +55,7 @@
                     var subgroupData = subgroupSnapshot.val();
                     var subgroupDiv = document.createElement("div");
                     subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'v_proof');
-                    subgroupDiv.innerHTML = subgroupKey + ": " + Object.values(subgroupData).join(', ');
+                    subgroupDiv.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
                     groupDiv.appendChild(subgroupDiv);
                 });
 
@@ -170,7 +170,7 @@
 
             var subgroupDiv = document.createElement("div");
             subgroupDiv.className = "subgroup " + prefix;
-            subgroupDiv.innerHTML = subgroupName + ": " + stringsArray.join(', ');
+            subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
             group.appendChild(subgroupDiv);
 
             if (prefix === 'proof') {
