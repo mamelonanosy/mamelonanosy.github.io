@@ -58,6 +58,44 @@
                     subgroupDiv.innerHTML = subgroupKey + ": " + Object.values(subgroupData).join(', ');
                     groupDiv.appendChild(subgroupDiv);
                 });
+
+                var editButton = document.createElement("button");
+                editButton.innerHTML = "Edit";
+                editButton.onclick = function() { editGroup(groupButton, ref.child(childKey)); };
+                groupDiv.appendChild(editButton);
+
+                var deleteButton = document.createElement("button");
+                deleteButton.innerHTML = "Delete";
+                deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
+                groupDiv.appendChild(deleteButton);
+
+                var subgroupButton = document.createElement("button");
+                subgroupButton.innerHTML = "Add proof";
+                subgroupButton.style.display = "none"; 
+                subgroupButton.onclick = function() { addSubgroup(ref.child(childKey), groupDiv, 'proof'); };
+                groupDiv.appendChild(subgroupButton);
+
+                var vProofButton = document.createElement("button");
+                vProofButton.innerHTML = "Add v_proof";
+                vProofButton.style.display = "none"; 
+                vProofButton.onclick = function() { 
+                    if (!groupDiv.getElementsByClassName('v_proof').length) {
+                        addSubgroup(ref.child(childKey), groupDiv, 'v_proof');
+                    } else {
+                        alert('Only one v_proof subgroup is allowed per group.');
+                    }
+                };
+                groupDiv.appendChild(vProofButton);
+
+                groupButton.onclick = function() {
+                    if (subgroupButton.style.display === "none") {
+                        subgroupButton.style.display = "block";
+                        vProofButton.style.display = "block";
+                    } else {
+                        subgroupButton.style.display = "none";
+                        vProofButton.style.display = "none";
+                    }
+                };
             });
         });
     }
