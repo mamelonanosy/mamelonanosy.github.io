@@ -74,6 +74,18 @@
                 }
             };
 
+            // Add proofs as subgroups when the "Add Proof" button is clicked
+            subgroupButton.onclick = function() {
+                var proofs = prompt("Please enter the proofs (separated by newlines):");
+                if (proofs != null) {
+                    var proofList = proofs.split("\n");
+                    for (var i = 0; i < proofList.length; i++) {
+                        var proofRef = db.ref('group_id/' + groupName + '/proof_' + (i + 1));
+                        proofRef.set(proofList[i]);
+                    }
+                }
+            };
+
             // Add a new group
             var groupContainer = document.getElementById("groupContainer");
             var newGroup = document.createElement("div");
@@ -101,5 +113,6 @@
         }
     }
 </script>
+
 </body>
 </html>
