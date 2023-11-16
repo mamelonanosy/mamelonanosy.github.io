@@ -15,11 +15,31 @@
         /* Add styles for the container */
         .container {
             display: flex; /* Make the children align horizontally */
+            flex-direction: column; /* Make the children align vertically */
         }
 
         /* Add styles for the button and text area */
         #editableText, #saveButton {
             margin-right: 10px; /* Add some space between the text area and the button */
+        }
+
+        /* Add styles for the pin button */
+        #pinButton {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        /* Add styles for the group content */
+        #groupContent {
+            display: none; /* Hide the group content by default */
         }
     </style>
     <script>
@@ -37,12 +57,16 @@
 </head>
 <body>
     <div class="container">
-        <div contenteditable="true" id="editableText">
-            This is an editable text. Click here to edit.
-        </div>
+        <button onclick="toggleGroupContent()" id="pinButton">📌</button>
 
-        <button onclick="saveText()" id="saveButton">Save</button>
-        <span class="checkmark" id="checkmark">✅</span>
+        <div id="groupContent">
+            <div contenteditable="true" id="editableText">
+                This is an editable text. Click here to edit.
+            </div>
+
+            <button onclick="saveText()" id="saveButton">Save</button>
+            <span class="checkmark" id="checkmark">✅</span>
+        </div>
     </div>
 
     <script>
@@ -72,6 +96,17 @@
                 checkmark.style.display = "none"; 
                 saveButton.style.display = "inline";
             }, 2000);
+        }
+
+        function toggleGroupContent() {
+            var groupContent = document.getElementById("groupContent");
+
+            // Toggle the display of the group content
+            if (groupContent.style.display === "none") {
+                groupContent.style.display = "block";
+            } else {
+                groupContent.style.display = "none";
+            }
         }
     </script>
 </body>
