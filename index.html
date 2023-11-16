@@ -5,44 +5,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
     <style>
-        /* The Modal (background) */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            padding-top: 100px; /* Location of the box */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        }
-
-        /* Modal Content */
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            color: black;
-        }
-
-        /* The Close Button */
-        .close {
-            color: #aaaaaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
+        /* Add styles for the checkmark */
+        .checkmark {
+            display: none;
+            color: green;
+            font-size: 20px;
         }
     </style>
     <script>
@@ -63,18 +30,8 @@
         This is an editable text. Click here to edit.
     </div>
 
-    <button onclick="saveText()">Save</button>
-
-    <!-- The Modal -->
-    <div id="myModal" class="modal">
-
-        <!-- Modal content -->
-        <div class="modal-content">
-            <span class="close">×</span>
-            <p>Save successfully changed</p>
-        </div>
-
-    </div>
+    <button onclick="saveText()" id="saveButton">Save</button>
+    <span class="checkmark" id="checkmark">✔️</span>
 
     <script>
         var db = firebase.database();
@@ -86,21 +43,23 @@
         function saveText() {
             var text = document.getElementById("editableText").innerHTML;
             ref.set(text).then(function() {
-                showModal();
+                showCheckmark();
             });
         }
 
-        function showModal() {
-            var modal = document.getElementById("myModal");
-            var span = document.getElementsByClassName("close")[0];
+        function showCheckmark() {
+            var saveButton = document.getElementById("saveButton");
+            var checkmark = document.getElementById("checkmark");
 
-            modal.style.display = "block";
+            // Hide the save button and show the checkmark
+            saveButton.style.display = "none";
+            checkmark.style.display = "inline";
 
-            span.onclick = function() {
-                modal.style.display = "none";
-            }
-
-            setTimeout(function(){ modal.style.display = "none"; }, 2000);
+            setTimeout(function(){ 
+                // Hide the checkmark and show the save button after 2 seconds
+                checkmark.style.display = "none"; 
+                saveButton.style.display = "inline";
+            }, 2000);
         }
     </script>
 </body>
