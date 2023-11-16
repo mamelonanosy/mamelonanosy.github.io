@@ -39,38 +39,37 @@
     <script>
         var db = firebase.database();
 
-function addGroup(button) {
-    var groupName = prompt("Please enter the group name:");
-    if (groupName != null) {
-        var ref = db.ref(groupName); // Change this line
-        ref.set(groupName);
+        function addGroup(button) {
+            var groupName = prompt("Please enter the group name:");
+            if (groupName != null) {
+                var ref = db.ref('group_id/' + groupName);
+                ref.set(groupName);
 
-        // Update the button text
-        button.innerHTML = groupName;
+                // Update the button text
+                button.innerHTML = groupName;
 
-        // Add edit and delete buttons
-        var editButton = document.createElement("button");
-        editButton.innerHTML = "Edit";
-        editButton.onclick = function() { editGroup(button, ref); };
-        button.parentNode.appendChild(editButton);
+                // Add edit and delete buttons
+                var editButton = document.createElement("button");
+                editButton.innerHTML = "Edit";
+                editButton.onclick = function() { editGroup(button, ref); };
+                button.parentNode.appendChild(editButton);
 
-        var deleteButton = document.createElement("button");
-        deleteButton.innerHTML = "Delete";
-        deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
-        button.parentNode.appendChild(deleteButton);
+                var deleteButton = document.createElement("button");
+                deleteButton.innerHTML = "Delete";
+                deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
+                button.parentNode.appendChild(deleteButton);
 
-        // Add a new group
-        var groupContainer = document.getElementById("groupContainer");
-        var newGroup = document.createElement("div");
-        newGroup.className = "group";
-        var newButton = document.createElement("button");
-        newButton.innerHTML = "Add Group";
-        newButton.onclick = function() { addGroup(newButton); };
-        newGroup.appendChild(newButton);
-        groupContainer.appendChild(newGroup);
-    }
-}
-
+                // Add a new group
+                var groupContainer = document.getElementById("groupContainer");
+                var newGroup = document.createElement("div");
+                newGroup.className = "group";
+                var newButton = document.createElement("button");
+                newButton.innerHTML = "Add Group";
+                newButton.onclick = function() { addGroup(newButton); };
+                newGroup.appendChild(newButton);
+                groupContainer.appendChild(newGroup);
+            }
+        }
 
         function editGroup(button, ref) {
             var newGroupName = prompt("Please enter the new group name:");
