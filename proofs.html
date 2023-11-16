@@ -38,84 +38,108 @@
     var db = firebase.database();
     var proofCounter = 0;
 
-function addGroup(button) {
-    var groupName = prompt("Please enter the group name:");
-    if (groupName != null) {
-        var ref = db.ref('group_id/' + groupName);
-        ref.set(groupName);
-
-        button.innerHTML = groupName;
-
-        var editButton = document.createElement("button");
-        editButton.innerHTML = "Edit";
-        editButton.onclick = function() { editGroup(button, ref); };
-        button.parentNode.appendChild(editButton);
-
-        var deleteButton = document.createElement("button");
-        deleteButton.innerHTML = "Delete";
-        deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
-        button.parentNode.appendChild(deleteButton);
-
-        var subgroupButton = document.createElement("button");
-        subgroupButton.innerHTML = "Add proof";
-        subgroupButton.style.display = "none"; 
-        subgroupButton.onclick = function() { addSubgroup(ref, button.parentNode, 'proof'); };
-        button.parentNode.appendChild(subgroupButton);
-
-        var vProofButton = document.createElement("button");
-        vProofButton.innerHTML = "Add v_proof";
-        vProofButton.style.display = "none"; 
-        vProofButton.onclick = function() { 
-            if (!button.parentNode.getElementsByClassName('v_proof').length) {
-                addSubgroup(ref, button.parentNode, 'v_proof'); 
-            } else {
-                alert('Only one v_proof subgroup is allowed per group.');
-            }
-        };
-        button.parentNode.appendChild(vProofButton);
-
-        var groupContainer = document.getElementById("groupContainer");
-        var newGroup = document.createElement("div");
-        newGroup.className = "group";
-        var newButton = document.createElement("button");
-        newButton.innerHTML = "Add Group";
-        newButton.onclick = function() { addGroup(newButton); };
-        newGroup.appendChild(newButton);
-        groupContainer.appendChild(newGroup);
-
-        button.onclick = function() {
-            if (subgroupButton.style.display === "none") {
-                subgroupButton.style.display = "block";
-                vProofButton.style.display = "block";
-            } else {
-                subgroupButton.style.display = "none";
-                vProofButton.style.display = "none";
-            }
-        };
-    }
-}
-
-function addSubgroup(ref, group, prefix) {
-    var strings = prompt("Please enter the list of strings separated by newlines:");
-    if (strings != null) {
-        var stringsArray = strings.split('\n');
-        var subgroupCount = group.getElementsByClassName('subgroup').length;
-        var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
-        var subgroupRef = ref.child(subgroupName);
-        stringsArray.forEach(function(string, index) {
-            subgroupRef.child(index.toString()).set(string);
+    window.onload = function() {
+        var ref = db.ref('group_id');
+        ref.once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
+                var groupButton = document.createElement("button");
+                groupButton.innerHTML = childKey;
+                var groupDiv = document.createElement("div");
+                groupDiv.className = "group";
+                groupDiv.appendChild(groupButton);
+                document.getElementById("groupContainer").appendChild(groupDiv);
+                childSnapshot.forEach(function(subgroupSnapshot) {
+                    var subgroupKey = subgroupSnapshot.key;
+                    var subgroupData = subgroupSnapshot.val();
+                    var subgroupDiv = document.createElement("div");
+                    subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'v_proof');
+                    subgroupDiv.innerHTML = subgroupKey + ": " + Object.values(subgroupData).join(', ');
+                    groupDiv.appendChild(subgroupDiv);
+                });
+            });
         });
+    }
 
-        var subgroupDiv = document.createElement("div");
-        subgroupDiv.className = "subgroup " + prefix;
-        subgroupDiv.innerHTML = subgroupName + ": " + stringsArray.join(', ');
-        group.appendChild(subgroupDiv);
+    function addGroup(button) {
+        var groupName = prompt("Please enter the group name:");
+        if (groupName != null) {
+            var ref = db.ref('group_id/' + groupName);
+            ref.set(groupName);
 
-        if (prefix === 'proof') {
-            proofCounter++;
+            button.innerHTML = groupName;
+
+            var editButton = document.createElement("button");
+            editButton.innerHTML = "Edit";
+            editButton.onclick = function() { editGroup(button, ref); };
+            button.parentNode.appendChild(editButton);
+
+            var deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "Delete";
+            deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
+            button.parentNode.appendChild(deleteButton);
+
+            var subgroupButton = document.createElement("button");
+            subgroupButton.innerHTML = "Add proof";
+            subgroupButton.style.display = "none"; 
+            subgroupButton.onclick = function() { addSubgroup(ref, button.parentNode, 'proof'); };
+            button.parentNode.appendChild(subgroupButton);
+
+            var vProofButton = document.createElement("button");
+            vProofButton.innerHTML = "Add v_proof";
+            vProofButton.style.display = "none"; 
+            vProofButton.onclick = function() { 
+                if (!button.parentNode.getElementsByClassName('v_proof').length) {
+                    addSubgroup(ref, button.parentNode, 'v_proof'); 
+                } else {
+                    alert('Only one v_proof subgroup is allowed per group.');
+                }
+            };
+            button.parentNode.appendChild(vProofButton);
+
+            var groupContainer = document.getElementById("groupContainer");
+            var newGroup = document.createElement("div");
+            newGroup.className = "group";
+            var newButton = document.createElement("button");
+            newButton.innerHTML = "Add Group";
+            newButton.onclick = function() { addGroup(newButton); };
+            newGroup.appendChild(newButton);
+            groupContainer.appendChild(newGroup);
+
+            button.onclick = function() {
+                if (subgroupButton.style.display === "none") {
+                    subgroupButton.style.display = "block";
+                    vProofButton.style.display = "block";
+                } else {
+                    subgroupButton.style.display = "none";
+                    vProofButton.style.display = "none";
+                }
+            };
         }
     }
-}
+
+    function addSubgroup(ref, group, prefix) {
+        var strings = prompt("Please enter the list of strings separated by newlines:");
+        if (strings != null) {
+            var stringsArray = strings.split('\n');
+            var subgroupCount = group.getElementsByClassName('subgroup').length;
+            var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
+            var subgroupRef = ref.child(subgroupName);
+            stringsArray.forEach(function(string, index) {
+                subgroupRef.child(index.toString()).set(string);
+            });
+
+            var subgroupDiv = document.createElement("div");
+            subgroupDiv.className = "subgroup " + prefix;
+            subgroupDiv.innerHTML = subgroupName + ": " + stringsArray.join(', ');
+            group.appendChild(subgroupDiv);
+
+            if (prefix === 'proof') {
+                proofCounter++;
+            }
+        }
+    }
 </script>
 
 </body>
