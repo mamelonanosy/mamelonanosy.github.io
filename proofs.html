@@ -1,10 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Proofs</title>
+    <title>Simple Editable Text Website</title>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <style>
+        /* Add styles for the checkmark */
+        .checkmark {
+            display: none;
+            color: green; /* Change the color to green */
+            font-size: 20px;
+        }
+
+        /* Add styles for the container */
+        .container {
+            display: flex; /* Make the children align horizontally */
+        }
+
+        /* Add styles for the button and text area */
+        #editableText, #saveButton {
+            margin-right: 10px; /* Add some space between the text area and the button */
+        }
+    </style>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyBKtqcRTqmwOn758IA3nOGIRzV7Qk_kG2Q",
+            authDomain: "automation-f208d.firebaseapp.com",
+            databaseURL: "https://automation-f208d-default-rtdb.firebaseio.com",
+            projectId: "automation-f208d",
+            storageBucket: "automation-f208d.appspot.com",
+            messagingSenderId: "861003739122",
+            appId: "1:861003739122:web:0866a42e4bbcc36d54056b"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
 </head>
 <body>
-    <h1>Welcome to the Proofs Page</h1>
-    <p>This is the proofs page of the website.</p>
+    <div class="container">
+        <div contenteditable="true" id="editableText">
+            This is an editable text. Click here to edit.
+        </div>
+
+        <button onclick="saveText()" id="saveButton">Save</button>
+        <span class="checkmark" id="checkmark">✅</span>
+    </div>
+
+    <script>
+        var db = firebase.database();
+        var groupName = document.getElementById("editableText").innerHTML; // Get the group name from the editable text
+        var ref = db.ref('groups/' + groupName); // Create a reference to the group in the database
+        ref.on('value', function(snapshot) {
+            document.getElementById("editableText").innerHTML = snapshot.val();
+        });
+
+        function saveText() {
+            var text = document.getElementById("editableText").innerHTML;
+            ref.set({
+                groupName: groupName,
+                subGroups: {
+                    subGroup1: {
+                        text: text
+                    },
+                    // Add more subgroups here
+                }
+            }).then(function() {
+                showCheckmark();
+            });
+        }
+
+        function showCheckmark() {
+            var saveButton = document.getElementById("saveButton");
+            var checkmark = document.getElementById("checkmark");
+
+            // Hide the save button and show the checkmark
+            saveButton.style.display = "none";
+            checkmark.style.display = "inline";
+
+            setTimeout(function(){ 
+                // Hide the checkmark and show the save button after 2 seconds
+                checkmark.style.display = "none"; 
+                saveButton.style.display = "inline";
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
