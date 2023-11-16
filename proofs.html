@@ -81,7 +81,7 @@
                     var proofList = proofs.split("\n");
                     for (var i = 0; i < proofList.length; i++) {
                         var proofRef = db.ref('group_id/' + groupName + '/proof_' + (i + 1));
-                        proofRef.set(proofList[i]);
+                        proofRef.set({id: 'string_' + (i + 1), value: proofList[i]});
                     }
                 }
             };
