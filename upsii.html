@@ -2,24 +2,271 @@
 <html>
 <head>
     <title>Simple Editable Text Website</title>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyBKtqcRTqmwOn758IA3nOGIRzV7Qk_kG2Q",
+            authDomain: "automation-f208d.firebaseapp.com",
+            databaseURL: "https://automation-f208d-default-rtdb.firebaseio.com",
+            projectId: "automation-f208d",
+            storageBucket: "automation-f208d.appspot.com",
+            messagingSenderId: "861003739122",
+            appId: "1:861003739122:web:0866a42e4bbcc36d54056b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', function () {
+    let namespace = 'adsUltimate_'; // Unique namespace for this extension
+
+    function checkLink(link) {
+        let forbiddenWords = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements'];
+        return !forbiddenWords.some(word => link.includes(word));
+    }
+
+    database.ref('ads').once('value')([namespace + 'links'], (result) => {
+        let links = result[namespace + 'links'];
+        if (!links) {
+            links = {};
+        }
+
+        let groupsDiv = document.getElementById('groups');
+        let keys = Object.keys(links);
+
+        keys.forEach((key, index) => {
+            let groupDiv = document.createElement('div');
+            groupDiv.className = 'group';
+
+            let groupName = document.createElement('button');
+            let linkCount = links[key].length;
+            groupName.textContent = `${index + 1}. ${key} (${linkCount})`;
+            if (linkCount <= 1) {
+                groupName.style.color = 'red';
+                groupName.style.fontWeight = 'bold';
+            }
+            groupDiv.appendChild(groupName);
+            let editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            groupDiv.appendChild(editButton);
+
+            let deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            groupDiv.appendChild(deleteButton);
+
+            let linksDiv = document.createElement('div');
+            linksDiv.className = 'links';
+
+            links[key].forEach((link, linkIndex) => {
+                let linkDiv = document.createElement('div');
+
+                let linkP = document.createElement('p');
+                linkP.textContent = link;
+                if (linkIndex < 3) {
+                    linkP.style.color = 'blue';
+                }
+                linkDiv.appendChild(linkP);
+
+                let editLinkButton = document.createElement('button');
+                editLinkButton.textContent = 'Edit Link';
+                linkDiv.appendChild(editLinkButton);
+
+                let deleteLinkButton = document.createElement('button');
+                deleteLinkButton.textContent = 'Delete Link';
+                linkDiv.appendChild(deleteLinkButton);
+
+                linksDiv.appendChild(linkDiv);
+
+                editLinkButton.addEventListener('click', function() {
+                    let newLink = prompt('Enter new URL for the link:');
+                    if (newLink && checkLink(newLink)) {
+                        links[key][linkIndex] = newLink;
+                        let saveObject = {};
+                        saveObject[namespace + 'links'] = links;
+                        database.ref('ads').set()(saveObject);
+                        location.reload();
+                    }
+                });
+
+                deleteLinkButton.addEventListener('click', function() {
+                    if (confirm(`Are you sure you want to delete the link ${link}?`)) {
+                        links[key].splice(linkIndex, 1);
+                        let saveObject = {};
+                        saveObject[namespace + 'links'] = links;
+                        database.ref('ads').set()(saveObject);
+                        location.reload();
+                    }
+                });
+
+                if (linkIndex === 2) {
+                    let addPrimaryLinkButton = document.createElement('button');
+                    addPrimaryLinkButton.textContent = 'Add Primary Link';
+                    linkDiv.appendChild(addPrimaryLinkButton);
+                    
+                    addPrimaryLinkButton.addEventListener('click', function() {
+                        let newPrimaryLinks = prompt('Enter new primary links (separated by newlines):');
+                        if (newPrimaryLinks) {
+                            newPrimaryLinks = newPrimaryLinks.trim().split('\n').map(link => link.trim());
+                            newPrimaryLinks = newPrimaryLinks.filter(checkLink);
+                            newPrimaryLinks = newPrimaryLinks.filter(link => !links[key].includes(link));
+
+                            if (links[key].length === 1 && links[key][0] === 'http://placeholder.com') {
+                                links[key] = [];
+                            }
+
+                            links[key].splice(2, 0, ...newPrimaryLinks); 
+                            let saveObject = {};
+                            saveObject[namespace + 'links'] = links;
+                            database.ref('ads').set()(saveObject, function() {
+                                location.reload();
+                            });
+                        }
+                    });
+                }
+
+                if (linkIndex === links[key].length - 1) {
+                    let addRotatingLinkButton = document.createElement('button');
+                    addRotatingLinkButton.textContent = 'Add Rotating Link';
+                    linkDiv.appendChild(addRotatingLinkButton);
+
+                    addRotatingLinkButton.addEventListener('click', function() {
+                        let newRotatingLinks = prompt('Enter new rotating links (separated by newlines):');
+                        if (newRotatingLinks) {
+                            newRotatingLinks = newRotatingLinks.trim().split('\n').map(link => link.trim());
+                            newRotatingLinks = newRotatingLinks.filter(checkLink);
+                            newRotatingLinks = newRotatingLinks.filter(link => !links[key].includes(link));
+
+                            if (links[key].length === 1 && links[key][0] === 'http://placeholder.com') {
+                                links[key] = [];
+                            }
+
+                            links[key].push(...newRotatingLinks); 
+                            let saveObject = {};
+                            saveObject[namespace + 'links'] = links;
+                            database.ref('ads').set()(saveObject, function() {
+                                location.reload();
+                            });
+                        }
+                    });
+                }
+            });
+
+            groupDiv.appendChild(linksDiv);
+
+            groupName.addEventListener('click', function() {
+                linksDiv.style.display = linksDiv.style.display === 'none' ? 'block' : 'none';
+            });
+
+            editButton.addEventListener('click', function() {
+                let newName = prompt('Enter new name for the group:');
+                if (newName) {
+                    links[newName] = links[key];
+                    delete links[key];
+                    let saveObject = {};
+                    saveObject[namespace + 'links'] = links;
+                    database.ref('ads').set()(saveObject);
+                    location.reload();
+                }
+            });
+
+            deleteButton.addEventListener('click', function() {
+                if (confirm(`Are you sure you want to delete the group ${key}?`)) {
+                    delete links[key];
+                    let saveObject = {};
+                    saveObject[namespace + 'links'] = links;
+                    database.ref('ads').set()(saveObject);
+                    location.reload();
+                }
+            });
+
+            groupsDiv.appendChild(groupDiv);
+        });
+
+        let addGroupButton = document.createElement('button');
+        addGroupButton.textContent = 'Add Group';
+        groupsDiv.appendChild(addGroupButton);
+
+        addGroupButton.addEventListener('click', function() {
+            let newGroupName = prompt('Enter new group name:');
+            if (newGroupName) {
+                if (links[newGroupName]) {
+                    alert('This group already exists!');
+                } else {
+                    links[newGroupName] = ['http://placeholder.com'];
+                    let saveObject = {};
+                    saveObject[namespace + 'links'] = links;
+                    database.ref('ads').set()(saveObject, function() {
+                        location.reload();
+                    });
+                }
+            }
+        });
+
+        let addBulkGroupButton = document.createElement('button');
+        addBulkGroupButton.textContent = 'Bulk Add Group and Links';
+        groupsDiv.appendChild(addBulkGroupButton);
+
+        addBulkGroupButton.addEventListener('click', function() {
+            let newGroups = prompt('Enter new groups and links (each group starts with group name, followed by links separated by newlines. Different groups are separated by lelenamboarazana):');
+            if (newGroups) {
+                newGroups = newGroups.trim().split('lelenamboarazana').map(group => group.trim().split('\n').map(link => link.trim()));
+                newGroups.forEach(group => {
+                    let groupName = group[0];
+                    let groupLinks = group.slice(1);
+                    if (links[groupName]) {
+                        alert(`The group ${groupName} already exists!`);
+                    } else {
+                        groupLinks = groupLinks.filter(checkLink);
+                        if (groupLinks.length === 0) {
+                            alert(`No valid links provided for the group ${groupName}!`);
+                        } else {
+                            links[groupName] = groupLinks;
+                            let saveObject = {};
+                            saveObject[namespace + 'links'] = links;
+                            database.ref('ads').set()(saveObject, function() {
+                                location.reload();
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+        let exportAllButton = document.createElement('button');
+        exportAllButton.textContent = 'Export All';
+        groupsDiv.appendChild(exportAllButton);
+
+        exportAllButton.addEventListener('click', function() {
+            database.ref('ads').once('value')([namespace + 'links'], (result) => {
+                let links = result[namespace + 'links'];
+                let exportText = '';
+                let groups = Object.keys(links);
+
+                // Build the export text with only the links
+                groups.forEach((groupName, index) => {
+                    // Join all the links in this group with a newline
+                    exportText += groupName + '\n' + links[groupName].join('\n');
+
+                    // If this is not the last group, add the separator
+                    if (index < groups.length - 1) {
+                        exportText += '\nlelenamboarazana\n';
+                    }
+                });
+
+                // Copy the export text to the clipboard
+                navigator.clipboard.writeText(exportText).then(() => {
+                    alert('Exported content copied to clipboard.');
+                }).catch(err => {
+                    console.error('Could not copy text: ', err);
+                });
+            });
+        });
+    });
+});
+
+    </script>
 </head>
 <body>
-    <div contenteditable="true" id="editableText">
-        This is an editable text. Click here to edit.
-    </div>
-
-    <button onclick="saveText()">Save</button>
-
-    <script>
-        // Check if there's saved text
-        if(localStorage.getItem("text")) {
-            document.getElementById("editableText").innerHTML = localStorage.getItem("text");
-        }
-
-        function saveText() {
-            var text = document.getElementById("editableText").innerHTML;
-            localStorage.setItem("text", text);
-        }
-    </script>
+    <div id="groups"></div>
 </body>
 </html>
