@@ -27,7 +27,7 @@
         return !forbiddenWords.some(word => link.includes(word));
     }
 
-    database.ref('br/links').once('value').then((snapshot) => {
+    database.ref('br_links').once('value').then((snapshot) => {
         let links = snapshot.val();
         if (!links) {
             links = {};
@@ -81,7 +81,7 @@
                     if (newLink && checkLink(newLink)) {
                         links[key][linkIndex] = newLink;
                         let saveObject = {};
-                        saveObject['br/links'] = links;
+                        saveObject['br_links'] = links;
                         database.ref('br/').set(saveObject).then(() => {
                             location.reload();
                         });
@@ -92,7 +92,7 @@
                     if (confirm(`Are you sure you want to delete the link ${link}?`)) {
                         links[key].splice(linkIndex, 1);
                         let saveObject = {};
-                        saveObject['br/links'] = links;
+                        saveObject['br_links'] = links;
                         database.ref('br/').set(saveObject).then(() => {
                             location.reload();
                         });
@@ -116,7 +116,7 @@
 
                         links[key].push(...newLinks); 
                         let saveObject = {};
-                        saveObject['br/links'] = links;
+                        saveObject['br_links'] = links;
                         database.ref('br/').set(saveObject).then(() => {
                             location.reload();
                         });
@@ -136,7 +136,7 @@
                     links[newName] = links[key];
                     delete links[key];
                     let saveObject = {};
-                    saveObject['br/links'] = links;
+                    saveObject['br_links'] = links;
                     database.ref('br/').set(saveObject).then(() => {
                         location.reload();
                     });
@@ -147,7 +147,7 @@
                 if (confirm(`Are you sure you want to delete the group ${key}?`)) {
                     delete links[key];
                     let saveObject = {};
-                    saveObject['br/links'] = links;
+                    saveObject['br_links'] = links;
                     database.ref('br/').set(saveObject).then(() => {
                         location.reload();
                     });
@@ -169,7 +169,7 @@
                 } else {
                     links[newGroupName] = ['http://placeholder.com'];
                     let saveObject = {};
-                    saveObject['br/links'] = links;
+                    saveObject['br_links'] = links;
                     database.ref('br/').set(saveObject).then(() => {
                         location.reload();
                     });
@@ -197,7 +197,7 @@
                         } else {
                             links[groupName] = groupLinks;
                             let saveObject = {};
-                            saveObject['br/links'] = links;
+                            saveObject['br_links'] = links;
                             database.ref('br/').set(saveObject).then(() => {
                                 location.reload();
                             });
