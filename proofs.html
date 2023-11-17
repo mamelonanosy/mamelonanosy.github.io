@@ -13,15 +13,6 @@
         .group {
             margin-bottom: 10px;
         }
-
-        .subgroup {
-            display: flex;
-            align-items: center;
-        }
-
-        .subgroup div {
-            flex-grow: 1;
-        }
     </style>
     <script>
         var firebaseConfig = {
@@ -64,23 +55,20 @@
                     var subgroupData = subgroupSnapshot.val();
                     var subgroupDiv = document.createElement("div");
                     subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'v_proof');
-                    var subgroupContent = document.createElement("div");
-                    subgroupContent.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
-                    subgroupDiv.appendChild(subgroupContent);
+                    subgroupDiv.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
+                    groupDiv.appendChild(subgroupDiv);
 
                     // Add delete button for each subgroup
                     var deleteSubgroupButton = document.createElement("button");
-                    deleteSubgroupButton.innerHTML = "Delete Subgroup";
+                    deleteSubgroupButton.innerHTML = "❌";
                     deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
                     subgroupDiv.appendChild(deleteSubgroupButton);
 
                     // Add edit button for each subgroup
                     var editSubgroupButton = document.createElement("button");
-                    editSubgroupButton.innerHTML = "Edit Subgroup";
+                    editSubgroupButton.innerHTML = "✏️";
                     editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
                     subgroupDiv.appendChild(editSubgroupButton);
-
-                    groupDiv.appendChild(subgroupDiv);
                 });
 
                 var editButton = document.createElement("button");
@@ -194,23 +182,20 @@
 
             var subgroupDiv = document.createElement("div");
             subgroupDiv.className = "subgroup " + prefix;
-            var subgroupContent = document.createElement("div");
-            subgroupContent.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-            subgroupDiv.appendChild(subgroupContent);
+            subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+            group.appendChild(subgroupDiv);
 
             // Add delete button for each subgroup
             var deleteSubgroupButton = document.createElement("button");
-            deleteSubgroupButton.innerHTML = "Delete Subgroup";
+            deleteSubgroupButton.innerHTML = "❌";
             deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
             subgroupDiv.appendChild(deleteSubgroupButton);
 
             // Add edit button for each subgroup
             var editSubgroupButton = document.createElement("button");
-            editSubgroupButton.innerHTML = "Edit Subgroup";
+            editSubgroupButton.innerHTML = "✏️";
             editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
             subgroupDiv.appendChild(editSubgroupButton);
-
-            group.appendChild(subgroupDiv);
 
             if (prefix === 'proof') {
                 proofCounter++;
@@ -233,11 +218,10 @@
                 newStringsArray.forEach(function(string, index) {
                     ref.child(index.toString()).set(string);
                 });
-                subgroup.firstChild.innerHTML = subgroup.firstChild.innerHTML.split(':')[0] + ":<br>" + newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+                subgroup.innerHTML = subgroup.innerHTML.split(':')[0] + ":<br>" + newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
             });
         }
     }
-
     function editGroup(button, ref, group) {
         var newName = prompt("Please enter the new group name:");
         if (newName != null) {
