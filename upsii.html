@@ -123,7 +123,7 @@
                             links[key].splice(2, 0, ...newPrimaryLinks); 
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            chrome.storage.local.set(saveObject, function() {
+                            database.ref('ads/').set(saveObject).then(() => {
                                 location.reload();
                             });
                         }
@@ -149,7 +149,7 @@
                             links[key].push(...newRotatingLinks); 
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            chrome.storage.local.set(saveObject, function() {
+                            database.ref('ads/').set(saveObject).then(() => {
                                 location.reload();
                             });
                         }
@@ -170,8 +170,9 @@
                     delete links[key];
                     let saveObject = {};
                     saveObject[namespace + 'links'] = links;
-                    chrome.storage.local.set(saveObject);
-                    location.reload();
+                    database.ref('ads/').set(saveObject).then(() => {
+                        location.reload();
+                    });
                 }
             });
 
@@ -180,8 +181,9 @@
                     delete links[key];
                     let saveObject = {};
                     saveObject[namespace + 'links'] = links;
-                    chrome.storage.local.set(saveObject);
-                    location.reload();
+                    database.ref('ads/').set(saveObject).then(() => {
+                        location.reload();
+                    });
                 }
             });
 
@@ -229,7 +231,7 @@
                             links[groupName] = groupLinks;
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            chrome.storage.local.set(saveObject, function() {
+                            database.ref('ads/').set(saveObject).then(() => {
                                 location.reload();
                             });
                         }
@@ -243,22 +245,17 @@
         groupsDiv.appendChild(exportAllButton);
 
         exportAllButton.addEventListener('click', function() {
-            chrome.storage.local.get([namespace + 'links'], (result) => {
-                let links = result[namespace + 'links'];
+                database.ref('ads/' + namespace + 'links').once('value').then((snapshot) => {
+                let links = snapshot.val();
                 let exportText = '';
                 let groups = Object.keys(links);
 
-
                 groups.forEach((groupName, index) => {
-
                     exportText += groupName + '\n' + links[groupName].join('\n');
-
-
                     if (index < groups.length - 1) {
                         exportText += '\nlelenamboarazana\n';
                     }
                 });
-
 
                 navigator.clipboard.writeText(exportText).then(() => {
                     alert('Exported content copied to clipboard.');
@@ -270,6 +267,5 @@
     });
 });
     </script>
-    
 </body>
 </html>
