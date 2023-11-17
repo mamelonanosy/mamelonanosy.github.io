@@ -51,12 +51,13 @@
         });
 
 function inputStrings() {
-    var text = prompt("Enter the strings separated by 2 newlines");
-    text = text.replace(/\n\n /g, ',');
-    text = text.replace(/(% )/g, '%,'); // Replace space after percentage sign with a comma
+    var text = prompt("Enter the strings separated by a percentage sign and everything that follows until the first number");
+    text = text.replace(/%.*?(?=[0-9])/gs, ',');
     ref.set(text).then(function() {
         showCheckmark();
     });
+}
+
 }
 
         function showCheckmark() {
