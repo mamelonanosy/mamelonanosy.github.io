@@ -40,24 +40,27 @@
         <button onclick="inputStrings()" id="inputButton">Input Strings</button>
         <span class="checkmark" id="checkmark">✅</span>
     </div>
-    <p id="lastInput">strings: </p>
+    <p id="lastInput">Last strings: </p>
 
     <script>
         var db = firebase.database();
         var ref = db.ref('text');
         ref.on('value', function(snapshot) {
             var text = snapshot.val();
-            document.getElementById("lastInput").innerHTML = "strings: " + text;
+            document.getElementById("lastInput").innerHTML = "Last strings: " + text;
         });
 
         function inputStrings() {
-            var text = prompt("Enter the strings separated by two newlines:");
-            var strings = text.split('\n\n'); // Split the text into an array of strings
-            strings = strings.map(function(string) { return string.trim(); }); // Trim whitespace from each string
-            text = strings.join(','); // Join the strings with commas
-            ref.set(text).then(function() {
-                showCheckmark();
-            });
+            var text = prompt("Enter the strings:");
+            var strings = text.match(/\d+ \/ \d+% /g); // Match strings of the format "number / percentage "
+            if (strings) {
+                text = strings.join(','); // Join the strings with commas
+                ref.set(text).then(function() {
+                    showCheckmark();
+                });
+            } else {
+                alert("No strings in the correct format were found.");
+            }
         }
 
         function showCheckmark() {
