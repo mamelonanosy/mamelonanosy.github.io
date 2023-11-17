@@ -55,17 +55,14 @@
                     var subgroupData = subgroupSnapshot.val();
                     var subgroupDiv = document.createElement("div");
                     subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'v_proof');
-                    var subgroupContent = document.createElement("div");
-                    subgroupContent.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
-                    subgroupDiv.appendChild(subgroupContent);
+                    subgroupDiv.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
                     groupDiv.appendChild(subgroupDiv);
 
-                    Object.entries(subgroupData).forEach(([key, value]) => {
-                        var deleteButton = document.createElement("button");
-                        deleteButton.innerHTML = "Delete " + key;
-                        deleteButton.onclick = function() { deleteString(subgroupRef.child(key), subgroupContent, key); };
-                        subgroupDiv.appendChild(deleteButton);
-                    });
+                    // Add delete button for each subgroup
+                    var deleteSubgroupButton = document.createElement("button");
+                    deleteSubgroupButton.innerHTML = "Delete Subgroup";
+                    deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
+                    subgroupDiv.appendChild(deleteSubgroupButton);
                 });
 
                 var editButton = document.createElement("button");
@@ -179,17 +176,14 @@
 
             var subgroupDiv = document.createElement("div");
             subgroupDiv.className = "subgroup " + prefix;
-            var subgroupContent = document.createElement("div");
-            subgroupContent.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-            subgroupDiv.appendChild(subgroupContent);
+            subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
             group.appendChild(subgroupDiv);
 
-            stringsArray.forEach(function(string, index) {
-                var deleteButton = document.createElement("button");
-                deleteButton.innerHTML = "Delete " + index;
-                deleteButton.onclick = function() { deleteString(subgroupRef.child(index.toString()), subgroupContent, index); };
-                subgroupDiv.appendChild(deleteButton);
-            });
+            // Add delete button for each subgroup
+            var deleteSubgroupButton = document.createElement("button");
+            deleteSubgroupButton.innerHTML = "Delete Subgroup";
+            deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
+            subgroupDiv.appendChild(deleteSubgroupButton);
 
             if (prefix === 'proof') {
                 proofCounter++;
@@ -197,12 +191,10 @@
         }
     }
 
-    function deleteString(ref, subgroupContent, key) {
-        if (confirm("Are you sure you want to delete this string?")) {
+    function deleteSubgroup(subgroup, ref) {
+        if (confirm("Are you sure you want to delete this subgroup?")) {
             ref.remove();
-            var html = subgroupContent.innerHTML;
-            var newHtml = html.replace(key + ": " + ref.key + "<br>", "");
-            subgroupContent.innerHTML = newHtml;
+            subgroup.parentNode.removeChild(subgroup);
         }
     }
 
