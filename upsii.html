@@ -157,7 +157,8 @@
             groupsDiv.appendChild(groupDiv);
         });
 
-addGroupButton.addEventListener('click', function() {
+    let addBulkGroupButton = document.createElement('button');
+    addGroupButton.addEventListener('click', function() {
     let newGroupName = prompt('Enter new group name:');
     if (newGroupName) {
         if (links[newGroupName]) {
