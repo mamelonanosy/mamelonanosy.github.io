@@ -239,12 +239,12 @@
             }
         });
 
-                let exportAllButton = document.createElement('button');
+        
+        let exportAllButton = document.createElement('button');
         exportAllButton.textContent = 'Export All';
         groupsDiv.appendChild(exportAllButton);
-
-        exportAllButton.addEventListener('click', function() {
-                database.ref('br/').once('value').then((snapshot) => {
+                exportAllButton.addEventListener('click', function() {
+            database.ref('br/').once('value').then((snapshot) => {
                 let links = snapshot.val();
                 let exportText = '';
                 let groups = Object.keys(links);
@@ -265,3 +265,6 @@
         });
     });
 });
+    </script>
+</body>
+</html>
