@@ -157,25 +157,42 @@
             groupsDiv.appendChild(groupDiv);
         });
 
-        let addGroupButton = document.createElement('button');
-        addGroupButton.textContent = 'Add Group';
-        groupsDiv.appendChild(addGroupButton);
+addGroupButton.addEventListener('click', function() {
+    let newGroupName = prompt('Enter new group name:');
+    if (newGroupName) {
+        if (links[newGroupName]) {
+            alert('This group already exists!');
+        } else {
+            links[newGroupName] = ['http://placeholder.com'];
+            let saveObject = {};
+            saveObject['br_links'] = links;
+            database.ref('br_').set(saveObject).then(() => {
+                // Create and append the new group to the DOM here
+                let groupDiv = document.createElement('div');
+                groupDiv.className = 'group';
 
-        addGroupButton.addEventListener('click', function() {
-            let newGroupName = prompt('Enter new group name:');
-            if (newGroupName) {
-                if (links[newGroupName]) {
-                    alert('This group already exists!');
-                } else {
-                    links[newGroupName] = ['http://placeholder.com'];
-                    let saveObject = {};
-                    saveObject['br_links'] = links;
-                    database.ref('br/').set(saveObject).then(() => {
-                        location.reload();
-                    });
-                }
-            }
-        });
+                let groupName = document.createElement('button');
+                groupName.textContent = `${keys.length + 1}. ${newGroupName} (1)`;
+                groupDiv.appendChild(groupName);
+
+                let editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                groupDiv.appendChild(editButton);
+
+                let deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                groupDiv.appendChild(deleteButton);
+
+                let linksDiv = document.createElement('div');
+                linksDiv.className = 'links';
+                groupDiv.appendChild(linksDiv);
+
+                groupsDiv.appendChild(groupDiv);
+            });
+        }
+    }
+});
+
 
         let addBulkGroupButton = document.createElement('button');
         addBulkGroupButton.textContent = 'Bulk Add Group and Links';
