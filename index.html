@@ -52,7 +52,9 @@
 
         function inputStrings() {
             var text = prompt("Enter the strings separated by two newlines:");
-            text = text.replace(/\n\n/g, ','); // Replace two newlines with one comma
+            var strings = text.split('\n\n'); // Split the text into an array of strings
+            strings = strings.map(function(string) { return string.trim(); }); // Trim whitespace from each string
+            text = strings.join(','); // Join the strings with commas
             ref.set(text).then(function() {
                 showCheckmark();
             });
