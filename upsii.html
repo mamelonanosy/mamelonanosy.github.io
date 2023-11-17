@@ -29,7 +29,7 @@
         return !forbiddenWords.some(word => link.includes(word));
     }
 
-    database.ref('ads/' + namespace + 'links').once('value').then((snapshot) => {
+    database.ref(database.ref().child('br').child('links')).once('value').then((snapshot) => {
         let links = snapshot.val();
         if (!links) {
             links = {};
@@ -86,7 +86,7 @@
                     if (newLink && checkLink(newLink)) {
                         links[key][linkIndex] = newLink;
                         let saveObject = {};
-                        saveObject[namespace + 'links'] = links;
+                        saveObject['links'] = links;
                         database.ref('ads/').set(saveObject).then(() => {
                             location.reload();
                         });
@@ -97,7 +97,7 @@
                     if (confirm(`Are you sure you want to delete the link ${link}?`)) {
                         links[key].splice(linkIndex, 1);
                         let saveObject = {};
-                        saveObject[namespace + 'links'] = links;
+                        saveObject['links'] = links;
                         database.ref('ads/').set(saveObject).then(() => {
                             location.reload();
                         });
@@ -122,7 +122,7 @@
 
                             links[key].splice(2, 0, ...newPrimaryLinks); 
                             let saveObject = {};
-                            saveObject[namespace + 'links'] = links;
+                            saveObject['links'] = links;
                             database.ref('ads/').set(saveObject).then(() => {
                                 location.reload();
                             });
@@ -148,7 +148,7 @@
 
                             links[key].push(...newRotatingLinks); 
                             let saveObject = {};
-                            saveObject[namespace + 'links'] = links;
+                            saveObject['links'] = links;
                             database.ref('ads/').set(saveObject).then(() => {
                                 location.reload();
                             });
@@ -169,7 +169,7 @@
                     links[newName] = links[key];
                     delete links[key];
                     let saveObject = {};
-                    saveObject[namespace + 'links'] = links;
+                    saveObject['links'] = links;
                     database.ref('ads/').set(saveObject).then(() => {
                         location.reload();
                     });
@@ -180,7 +180,7 @@
                 if (confirm(`Are you sure you want to delete the group ${key}?`)) {
                     delete links[key];
                     let saveObject = {};
-                    saveObject[namespace + 'links'] = links;
+                    saveObject['links'] = links;
                     database.ref('ads/').set(saveObject).then(() => {
                         location.reload();
                     });
@@ -202,7 +202,7 @@
                 } else {
                     links[newGroupName] = ['http://placeholder.com'];
                     let saveObject = {};
-                    saveObject[namespace + 'links'] = links;
+                    saveObject['links'] = links;
                     database.ref('ads/').set(saveObject).then(() => {
                         location.reload();
                     });
@@ -230,7 +230,7 @@
                         } else {
                             links[groupName] = groupLinks;
                             let saveObject = {};
-                            saveObject[namespace + 'links'] = links;
+                            saveObject['links'] = links;
                             database.ref('ads/').set(saveObject).then(() => {
                                 location.reload();
                             });
@@ -245,7 +245,7 @@
         groupsDiv.appendChild(exportAllButton);
 
         exportAllButton.addEventListener('click', function() {
-                database.ref('ads/' + namespace + 'links').once('value').then((snapshot) => {
+                database.ref(database.ref().child('br').child('links')).once('value').then((snapshot) => {
                 let links = snapshot.val();
                 let exportText = '';
                 let groups = Object.keys(links);
