@@ -199,7 +199,7 @@
                 if (links[newGroupName]) {
                     alert('This group already exists!');
                 } else {
-                    links[newGroupName] = ['http://placeholder.com'];
+                    links[newGroupName] = [];
                     let saveObject = {};
                     saveObject['links'] = links;
                     database.ref('br/').set(saveObject).then(() => {
