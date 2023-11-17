@@ -29,7 +29,7 @@
         return !forbiddenWords.some(word => link.includes(word));
     }
 
-    database.ref('br/' + namespace + 'links').once('value').then((snapshot) => {
+    database.ref('br/').once('value').then((snapshot) => {
         let links = snapshot.val();
         if (!links) {
             links = {};
@@ -244,7 +244,7 @@
         exportAllButton.textContent = 'Export All';
         groupsDiv.appendChild(exportAllButton);
                 exportAllButton.addEventListener('click', function() {
-            database.ref('br/' + namespace + 'links').once('value').then((snapshot) => {
+            database.ref('br/').once('value').then((snapshot) => {
                 let links = snapshot.val();
                 let exportText = '';
                 let groups = Object.keys(links);
