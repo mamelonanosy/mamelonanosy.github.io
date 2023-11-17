@@ -52,7 +52,7 @@
 
         function inputStrings() {
             var text = prompt("Enter the strings separated by 2 newlines");
-            text = text.replace(/\n\n/g, ',');
+            text = text.replace(/\n\n /g, ',');
             ref.set(text).then(function() {
                 showCheckmark();
             });
