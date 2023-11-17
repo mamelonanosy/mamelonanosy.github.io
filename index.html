@@ -51,7 +51,7 @@
         });
 
         function inputStrings() {
-            var text = prompt("Enter the strings separated by 2 newlines");
+            var text = prompt("Enter the strings separated by newlines");
             text = text.replace(/\n\n /g, ',');
             ref.set(text).then(function() {
                 showCheckmark();
