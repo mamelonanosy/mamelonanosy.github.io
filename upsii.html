@@ -27,7 +27,7 @@
         return !forbiddenWords.some(word => link.includes(word));
     }
 
-    database.ref('br_links').once('value').then((snapshot) => {
+    database.ref('br/links').once('value').then((snapshot) => {
         let links = snapshot.val();
         if (!links) {
             links = {};
@@ -64,6 +64,9 @@
 
                 let linkP = document.createElement('p');
                 linkP.textContent = link;
+                if (linkIndex < 3) {
+                    linkP.style.color = 'blue';
+                }
                 linkDiv.appendChild(linkP);
 
                 let editLinkButton = document.createElement('button');
@@ -81,7 +84,7 @@
                     if (newLink && checkLink(newLink)) {
                         links[key][linkIndex] = newLink;
                         let saveObject = {};
-                        saveObject['br_links'] = links;
+                        saveObject['br/links'] = links;
                         database.ref('br/').set(saveObject).then(() => {
                             location.reload();
                         });
@@ -92,36 +95,64 @@
                     if (confirm(`Are you sure you want to delete the link ${link}?`)) {
                         links[key].splice(linkIndex, 1);
                         let saveObject = {};
-                        saveObject['br_links'] = links;
+                        saveObject['br/links'] = links;
                         database.ref('br/').set(saveObject).then(() => {
                             location.reload();
                         });
                     }
                 });
 
-                let addLinkButton = document.createElement('button');
-                addLinkButton.textContent = 'Add Link';
-                linkDiv.appendChild(addLinkButton);
+                if (linkIndex === 2) {
+                    let addPrimaryLinkButton = document.createElement('button');
+                    addPrimaryLinkButton.textContent = 'Add Primary Link';
+                    linkDiv.appendChild(addPrimaryLinkButton);
+                    
+                    addPrimaryLinkButton.addEventListener('click', function() {
+                        let newPrimaryLinks = prompt('Enter new primary links (separated by newlines):');
+                        if (newPrimaryLinks) {
+                            newPrimaryLinks = newPrimaryLinks.trim().split('\n').map(link => link.trim());
+                            newPrimaryLinks = newPrimaryLinks.filter(checkLink);
+                            newPrimaryLinks = newPrimaryLinks.filter(link => !links[key].includes(link));
 
-                addLinkButton.addEventListener('click', function() {
-                    let newLinks = prompt('Enter new links (separated by newlines):');
-                    if (newLinks) {
-                        newLinks = newLinks.trim().split('\n').map(link => link.trim());
-                        newLinks = newLinks.filter(checkLink);
-                        newLinks = newLinks.filter(link => !links[key].includes(link));
+                            if (links[key].length === 1 && links[key][0] === 'http://placeholder.com') {
+                                links[key] = [];
+                            }
 
-                        if (links[key].length === 1 && links[key][0] === 'http://placeholder.com') {
-                            links[key] = [];
+                            links[key].splice(2, 0, ...newPrimaryLinks); 
+                            let saveObject = {};
+                            saveObject['br/links'] = links;
+                            database.ref('br/').set(saveObject).then(() => {
+                                location.reload();
+                            });
                         }
+                    });
+                }
 
-                        links[key].push(...newLinks); 
-                        let saveObject = {};
-                        saveObject['br_links'] = links;
-                        database.ref('br/').set(saveObject).then(() => {
-                            location.reload();
-                        });
-                    }
-                });
+                if (linkIndex === links[key].length - 1) {
+                    let addRotatingLinkButton = document.createElement('button');
+                    addRotatingLinkButton.textContent = 'Add Rotating Link';
+                    linkDiv.appendChild(addRotatingLinkButton);
+
+                    addRotatingLinkButton.addEventListener('click', function() {
+                        let newRotatingLinks = prompt('Enter new rotating links (separated by newlines):');
+                        if (newRotatingLinks) {
+                            newRotatingLinks = newRotatingLinks.trim().split('\n').map(link => link.trim());
+                            newRotatingLinks = newRotatingLinks.filter(checkLink);
+                            newRotatingLinks = newRotatingLinks.filter(link => !links[key].includes(link));
+
+                            if (links[key].length === 1 && links[key][0] === 'http://placeholder.com') {
+                                links[key] = [];
+                            }
+
+                            links[key].push(...newRotatingLinks); 
+                            let saveObject = {};
+                            saveObject['br/links'] = links;
+                            database.ref('br/').set(saveObject).then(() => {
+                                location.reload();
+                            });
+                        }
+                    });
+                }
             });
 
             groupDiv.appendChild(linksDiv);
@@ -136,7 +167,7 @@
                     links[newName] = links[key];
                     delete links[key];
                     let saveObject = {};
-                    saveObject['br_links'] = links;
+                    saveObject['br/links'] = links;
                     database.ref('br/').set(saveObject).then(() => {
                         location.reload();
                     });
@@ -147,7 +178,7 @@
                 if (confirm(`Are you sure you want to delete the group ${key}?`)) {
                     delete links[key];
                     let saveObject = {};
-                    saveObject['br_links'] = links;
+                    saveObject['br/links'] = links;
                     database.ref('br/').set(saveObject).then(() => {
                         location.reload();
                     });
@@ -157,43 +188,25 @@
             groupsDiv.appendChild(groupDiv);
         });
 
-    let addGroupButton = document.createElement('button');
-    addGroupButton.addEventListener('click', function() {
-    let newGroupName = prompt('Enter new group name:');
-    if (newGroupName) {
-        if (links[newGroupName]) {
-            alert('This group already exists!');
-        } else {
-            links[newGroupName] = ['http://placeholder.com'];
-            let saveObject = {};
-            saveObject['br_links'] = links;
-            database.ref('br_').set(saveObject).then(() => {
-                // Create and append the new group to the DOM here
-                let groupDiv = document.createElement('div');
-                groupDiv.className = 'group';
+        let addGroupButton = document.createElement('button');
+        addGroupButton.textContent = 'Add Group';
+        groupsDiv.appendChild(addGroupButton);
 
-                let groupName = document.createElement('button');
-                groupName.textContent = `${keys.length + 1}. ${newGroupName} (1)`;
-                groupDiv.appendChild(groupName);
-
-                let editButton = document.createElement('button');
-                editButton.textContent = 'Edit';
-                groupDiv.appendChild(editButton);
-
-                let deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                groupDiv.appendChild(deleteButton);
-
-                let linksDiv = document.createElement('div');
-                linksDiv.className = 'links';
-                groupDiv.appendChild(linksDiv);
-
-                groupsDiv.appendChild(groupDiv);
-            });
-        }
-    }
-});
-
+        addGroupButton.addEventListener('click', function() {
+            let newGroupName = prompt('Enter new group name:');
+            if (newGroupName) {
+                if (links[newGroupName]) {
+                    alert('This group already exists!');
+                } else {
+                    links[newGroupName] = ['http://placeholder.com'];
+                    let saveObject = {};
+                    saveObject['br/links'] = links;
+                    database.ref('br/').set(saveObject).then(() => {
+                        location.reload();
+                    });
+                }
+            }
+        });
 
         let addBulkGroupButton = document.createElement('button');
         addBulkGroupButton.textContent = 'Bulk Add Group and Links';
@@ -215,7 +228,7 @@
                         } else {
                             links[groupName] = groupLinks;
                             let saveObject = {};
-                            saveObject['br_links'] = links;
+                            saveObject['br/links'] = links;
                             database.ref('br/').set(saveObject).then(() => {
                                 location.reload();
                             });
