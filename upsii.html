@@ -23,11 +23,11 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
     function checkLink(link) {
-        let forbiddenWords = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements'];
+        let forbiddenWords = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
         return !forbiddenWords.some(word => link.includes(word));
     }
 
-    database.ref(ads/links + 'links').once('value').then((snapshot) => {
+    database.ref(br/links + 'links').once('value').then((snapshot) => {
         let links = snapshot.val();
         if (!links) {
             links = {};
@@ -85,7 +85,7 @@
                         links[key][linkIndex] = newLink;
                         let saveObject = {};
                         saveObject[namespace + 'links'] = links;
-                        database.ref('ads/').set(saveObject).then(() => {
+                        database.ref('br/').set(saveObject).then(() => {
                             location.reload();
                         });
                     }
@@ -96,7 +96,7 @@
                         links[key].splice(linkIndex, 1);
                         let saveObject = {};
                         saveObject[namespace + 'links'] = links;
-                        database.ref('ads/').set(saveObject).then(() => {
+                        database.ref('br/').set(saveObject).then(() => {
                             location.reload();
                         });
                     }
@@ -121,7 +121,7 @@
                             links[key].splice(2, 0, ...newPrimaryLinks); 
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            database.ref('ads/').set(saveObject).then(() => {
+                            database.ref('br/').set(saveObject).then(() => {
                                 location.reload();
                             });
                         }
@@ -147,7 +147,7 @@
                             links[key].push(...newRotatingLinks); 
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            database.ref('ads/').set(saveObject).then(() => {
+                            database.ref('br/').set(saveObject).then(() => {
                                 location.reload();
                             });
                         }
@@ -168,7 +168,7 @@
                     delete links[key];
                     let saveObject = {};
                     saveObject[namespace + 'links'] = links;
-                    database.ref('ads/').set(saveObject).then(() => {
+                    database.ref('br/').set(saveObject).then(() => {
                         location.reload();
                     });
                 }
@@ -179,7 +179,7 @@
                     delete links[key];
                     let saveObject = {};
                     saveObject[namespace + 'links'] = links;
-                    database.ref('ads/').set(saveObject).then(() => {
+                    database.ref('br/').set(saveObject).then(() => {
                         location.reload();
                     });
                 }
@@ -201,7 +201,7 @@
                     links[newGroupName] = ['http://placeholder.com'];
                     let saveObject = {};
                     saveObject[namespace + 'links'] = links;
-                    database.ref('ads/').set(saveObject).then(() => {
+                    database.ref('br/').set(saveObject).then(() => {
                         location.reload();
                     });
                 }
@@ -229,7 +229,7 @@
                             links[groupName] = groupLinks;
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            database.ref('ads/').set(saveObject).then(() => {
+                            database.ref('br/').set(saveObject).then(() => {
                                 location.reload();
                             });
                         }
@@ -243,7 +243,7 @@
         groupsDiv.appendChild(exportAllButton);
 
         exportAllButton.addEventListener('click', function() {
-                database.ref(ads/links + 'links').once('value').then((snapshot) => {
+                database.ref(br/links + 'links').once('value').then((snapshot) => {
                 let links = snapshot.val();
                 let exportText = '';
                 let groups = Object.keys(links);
