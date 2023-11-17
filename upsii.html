@@ -16,17 +16,20 @@
         };
         firebase.initializeApp(firebaseConfig);
         var database = firebase.database();
-
+    </script>
+</head>
+<body>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
-    let namespace = 'adsUltimate_'; // Unique namespace for this extension
+    let namespace = 'adsUltimate_'; 
 
     function checkLink(link) {
         let forbiddenWords = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements'];
         return !forbiddenWords.some(word => link.includes(word));
     }
 
-    database.ref('ads').once('value')([namespace + 'links'], (result) => {
-        let links = result[namespace + 'links'];
+    database.ref('ads/' + namespace + 'links').once('value').then((snapshot) => {
+        let links = snapshot.val();
         if (!links) {
             links = {};
         }
@@ -83,8 +86,9 @@
                         links[key][linkIndex] = newLink;
                         let saveObject = {};
                         saveObject[namespace + 'links'] = links;
-                        database.ref('ads').set()(saveObject);
-                        location.reload();
+                        database.ref('ads/').set(saveObject).then(() => {
+                            location.reload();
+                        });
                     }
                 });
 
@@ -93,8 +97,9 @@
                         links[key].splice(linkIndex, 1);
                         let saveObject = {};
                         saveObject[namespace + 'links'] = links;
-                        database.ref('ads').set()(saveObject);
-                        location.reload();
+                        database.ref('ads/').set(saveObject).then(() => {
+                            location.reload();
+                        });
                     }
                 });
 
@@ -117,7 +122,7 @@
                             links[key].splice(2, 0, ...newPrimaryLinks); 
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            database.ref('ads').set()(saveObject, function() {
+                            chrome.storage.local.set(saveObject, function() {
                                 location.reload();
                             });
                         }
@@ -143,7 +148,7 @@
                             links[key].push(...newRotatingLinks); 
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            database.ref('ads').set()(saveObject, function() {
+                            chrome.storage.local.set(saveObject, function() {
                                 location.reload();
                             });
                         }
@@ -164,7 +169,7 @@
                     delete links[key];
                     let saveObject = {};
                     saveObject[namespace + 'links'] = links;
-                    database.ref('ads').set()(saveObject);
+                    chrome.storage.local.set(saveObject);
                     location.reload();
                 }
             });
@@ -174,7 +179,7 @@
                     delete links[key];
                     let saveObject = {};
                     saveObject[namespace + 'links'] = links;
-                    database.ref('ads').set()(saveObject);
+                    chrome.storage.local.set(saveObject);
                     location.reload();
                 }
             });
@@ -195,7 +200,7 @@
                     links[newGroupName] = ['http://placeholder.com'];
                     let saveObject = {};
                     saveObject[namespace + 'links'] = links;
-                    database.ref('ads').set()(saveObject, function() {
+                    database.ref('ads/').set(saveObject).then(() => {
                         location.reload();
                     });
                 }
@@ -223,7 +228,7 @@
                             links[groupName] = groupLinks;
                             let saveObject = {};
                             saveObject[namespace + 'links'] = links;
-                            database.ref('ads').set()(saveObject, function() {
+                            chrome.storage.local.set(saveObject, function() {
                                 location.reload();
                             });
                         }
@@ -237,23 +242,23 @@
         groupsDiv.appendChild(exportAllButton);
 
         exportAllButton.addEventListener('click', function() {
-            database.ref('ads').once('value')([namespace + 'links'], (result) => {
+            chrome.storage.local.get([namespace + 'links'], (result) => {
                 let links = result[namespace + 'links'];
                 let exportText = '';
                 let groups = Object.keys(links);
 
-                // Build the export text with only the links
+
                 groups.forEach((groupName, index) => {
-                    // Join all the links in this group with a newline
+
                     exportText += groupName + '\n' + links[groupName].join('\n');
 
-                    // If this is not the last group, add the separator
+
                     if (index < groups.length - 1) {
                         exportText += '\nlelenamboarazana\n';
                     }
                 });
 
-                // Copy the export text to the clipboard
+
                 navigator.clipboard.writeText(exportText).then(() => {
                     alert('Exported content copied to clipboard.');
                 }).catch(err => {
@@ -263,11 +268,6 @@
         });
     });
 });
-
     </script>
-</head>
-<body>
-    <div id="groups"></div>
-    <title>Simple Editable Text Website</title>
 </body>
 </html>
