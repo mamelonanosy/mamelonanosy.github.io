@@ -36,10 +36,9 @@
 
 <script>
     var db = firebase.database();
-    var proofCounter = 0;
 
     window.onload = function() {
-    var ref = db.ref('br');
+    var ref = db.ref('tasks');
     ref.once('value', function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
             var childKey = childSnapshot.key;
@@ -54,7 +53,7 @@
                 var subgroupKey = subgroupSnapshot.key;
                 var subgroupData = subgroupSnapshot.val();
                 var subgroupDiv = document.createElement("div");
-                subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'v_proof');
+                subgroupDiv.className = "subgroup";
                 subgroupDiv.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
                 groupDiv.appendChild(subgroupDiv);
 
@@ -81,31 +80,17 @@
             deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
             groupDiv.appendChild(deleteButton);
 
-            var subgroupButton = document.createElement("button");
-            subgroupButton.innerHTML = "Add proof";
-            subgroupButton.style.display = "none"; 
-            subgroupButton.onclick = function() { addSubgroup(ref.child(childKey), groupDiv, 'proof'); };
-            groupDiv.appendChild(subgroupButton);
-
-            var vProofButton = document.createElement("button");
-            vProofButton.innerHTML = "Add v_proof";
-            vProofButton.style.display = "none"; 
-            vProofButton.onclick = function() { 
-                if (!groupDiv.getElementsByClassName('v_proof').length) {
-                    addSubgroup(ref.child(childKey), groupDiv, 'v_proof');
-                } else {
-                    alert('Only one v_proof subgroup is allowed per group.');
-                }
-            };
-            groupDiv.appendChild(vProofButton);
+            var linksButton = document.createElement("button");
+            linksButton.innerHTML = "Add links";
+            linksButton.style.display = "none";
+            linksButton.onclick = function() { addSubgroup(ref.child(childKey), groupDiv, 'links'); };
+            groupDiv.appendChild(linksButton);
 
             groupButton.onclick = function() {
-                if (subgroupButton.style.display === "none") {
-                    subgroupButton.style.display = "block";
-                    vProofButton.style.display = "block";
+                if (linksButton.style.display === "none") {
+                    linksButton.style.display = "block";
                 } else {
-                    subgroupButton.style.display = "none";
-                    vProofButton.style.display = "none";
+                    linksButton.style.display = "none";
                 }
             };
         });
@@ -113,7 +98,7 @@
         var deleteAllButton = document.getElementById("deleteAllButton");
         deleteAllButton.onclick = function() {
             if (confirm("Are you sure you want to delete all data?")) {
-                var ref = db.ref('br');
+                var ref = db.ref('tasks');
                 ref.remove();
                 var groupContainer = document.getElementById("groupContainer");
                 while (groupContainer.firstChild) {
@@ -134,7 +119,7 @@
     function addGroup(button) {
         var groupName = prompt("Please enter the group name:");
         if (groupName != null) {
-            var ref = db.ref('br/' + groupName);
+            var ref = db.ref('tasks/' + groupName);
             ref.set(groupName);
 
             button.innerHTML = groupName;
@@ -149,23 +134,11 @@
             deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
             button.parentNode.appendChild(deleteButton);
 
-            var subgroupButton = document.createElement("button");
-            subgroupButton.innerHTML = "Add proof";
-            subgroupButton.style.display = "none"; 
-            subgroupButton.onclick = function() { addSubgroup(ref, button.parentNode, 'proof'); };
-            button.parentNode.appendChild(subgroupButton);
-
-            var vProofButton = document.createElement("button");
-            vProofButton.innerHTML = "Add v_proof";
-            vProofButton.style.display = "none"; 
-            vProofButton.onclick = function() { 
-                if (!button.parentNode.getElementsByClassName('v_proof').length) {
-                    addSubgroup(ref, button.parentNode, 'v_proof');
-                } else {
-                    alert('Only one v_proof subgroup is allowed per group.');
-                }
-            };
-            button.parentNode.appendChild(vProofButton);
+            var linksButton = document.createElement("button");
+            linksButton.innerHTML = "Add links";
+            linksButton.style.display = "none"; 
+            linksButton.onclick = function() { addSubgroup(ref, button.parentNode, 'links'); };
+            button.parentNode.appendChild(linksButton);
 
             var groupContainer = document.getElementById("groupContainer");
             var newGroup = document.createElement("div");
@@ -177,12 +150,10 @@
             groupContainer.appendChild(newGroup);
 
             button.onclick = function() {
-                if (subgroupButton.style.display === "none") {
-                    subgroupButton.style.display = "block";
-                    vProofButton.style.display = "block";
+                if (linksButton.style.display === "none") {
+                    linksButton.style.display = "block";
                 } else {
-                    subgroupButton.style.display = "none";
-                    vProofButton.style.display = "none";
+                    linksButton.style.display = "none";
                 }
             };
         }
@@ -192,15 +163,18 @@
         var strings = prompt("Please enter the list of strings separated by newlines:");
         if (strings != null) {
             var stringsArray = strings.split('\n');
-            var subgroupCount = group.getElementsByClassName('subgroup').length;
-            var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
+            var subgroupName;
+            if (prefix === 'links') {
+                subgroupName = Math.random().toString(36).substring(2, 7);
+            } else {
+                subgroupName = prefix;
+            }
             var subgroupRef = ref.child(subgroupName);
             stringsArray.forEach(function(string, index) {
                 subgroupRef.child(index.toString()).set(string);
             });
-
             var subgroupDiv = document.createElement("div");
-            subgroupDiv.className = "subgroup " + prefix;
+            subgroupDiv.className = "subgroup";
             subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
             group.appendChild(subgroupDiv);
 
@@ -215,10 +189,6 @@
             editSubgroupButton.innerHTML = "✏️";
             editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
             subgroupDiv.appendChild(editSubgroupButton);
-
-            if (prefix === 'proof') {
-                proofCounter++;
-            }
         }
     }
 
@@ -252,14 +222,7 @@
                         button.innerHTML = newName;
                         button.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { editGroup(button, newRef, group); };
                         button.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { deleteGroup(group, newRef); };
-                        button.nextSibling.nextSibling.onclick = function() { addSubgroup(newRef, group, 'proof'); };
-                        button.nextSibling.nextSibling.nextSibling.onclick = function() { 
-                            if (!group.getElementsByClassName('v_proof').length) {
-                                addSubgroup(newRef, group, 'v_proof');
-                            } else {
-                                alert('Only one v_proof subgroup is allowed per group.');
-                            }
-                        };
+                        button.nextSibling.nextSibling.onclick = function() { addSubgroup(newRef, group, 'links'); };
                     }
                 });
             });
