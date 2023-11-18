@@ -38,107 +38,61 @@
     var db = firebase.database();
 
     window.onload = function() {
-    var ref = db.ref('proofs');
-    ref.once('value', function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-            var childKey = childSnapshot.key;
-            var childData = childSnapshot.val();
-            var groupButton = document.createElement("button");
-            groupButton.innerHTML = childKey;
-            var groupDiv = document.createElement("div");
-            groupDiv.className = "group";
-            groupDiv.appendChild(groupButton);
-            document.getElementById("groupContainer").appendChild(groupDiv);
-            childSnapshot.forEach(function(subgroupSnapshot) {
-                var subgroupKey = subgroupSnapshot.key;
-                var subgroupData = subgroupSnapshot.val();
-                var subgroupDiv = document.createElement("div");
-                subgroupDiv.className = "subgroup";
-                subgroupDiv.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
-                groupDiv.appendChild(subgroupDiv);
+        var ref = db.ref('proofs');
+        ref.once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
+                var groupButton = document.createElement("button");
+                groupButton.innerHTML = childKey;
+                var groupDiv = document.createElement("div");
+                groupDiv.className = "group";
+                groupDiv.appendChild(groupButton);
+                document.getElementById("groupContainer").appendChild(groupDiv);
 
-                // Add delete button for each subgroup
-                var deleteSubgroupButton = document.createElement("button");
-                deleteSubgroupButton.innerHTML = "❌";
-                deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
-                subgroupDiv.appendChild(deleteSubgroupButton);
-
-                // Add edit button for each subgroup
-                var editSubgroupButton = document.createElement("button");
-                editSubgroupButton.innerHTML = "✏️";
-                editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
-                subgroupDiv.appendChild(editSubgroupButton);
+                var deleteButton = document.createElement("button");
+                deleteButton.innerHTML = "Delete";
+                deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
+                groupDiv.appendChild(deleteButton);
             });
 
-            var editButton = document.createElement("button");
-            editButton.innerHTML = "Edit";
-            editButton.onclick = function() { editGroup(groupButton, ref.child(childKey), groupDiv); };
-            groupDiv.appendChild(editButton);
-
-            var deleteButton = document.createElement("button");
-            deleteButton.innerHTML = "Delete";
-            deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
-            groupDiv.appendChild(deleteButton);
-
-            var linksButton = document.createElement("button");
-            linksButton.innerHTML = "Add links";
-            linksButton.style.display = "none";
-            linksButton.onclick = function() { addSubgroup(ref.child(childKey), groupDiv, 'links'); };
-            groupDiv.appendChild(linksButton);
-
-            groupButton.onclick = function() {
-                if (linksButton.style.display === "none") {
-                    linksButton.style.display = "block";
-                } else {
-                    linksButton.style.display = "none";
+            var deleteAllButton = document.getElementById("deleteAllButton");
+            deleteAllButton.onclick = function() {
+                if (confirm("Are you sure you want to delete all data?")) {
+                    var ref = db.ref('proofs');
+                    ref.remove();
+                    var groupContainer = document.getElementById("groupContainer");
+                    while (groupContainer.firstChild) {
+                        groupContainer.removeChild(groupContainer.firstChild);
+                    }
+                    var newGroup = document.createElement("div");
+                    newGroup.className = "group";
+                    var newButton = document.createElement("button");
+                    newButton.innerHTML = "Add Group";
+                    newButton.onclick = function() { addGroup(newButton); };
+                    newGroup.appendChild(newButton);
+                    groupContainer.appendChild(newGroup);
                 }
             };
         });
-
-        var deleteAllButton = document.getElementById("deleteAllButton");
-        deleteAllButton.onclick = function() {
-            if (confirm("Are you sure you want to delete all data?")) {
-                var ref = db.ref('proofs');
-                ref.remove();
-                var groupContainer = document.getElementById("groupContainer");
-                while (groupContainer.firstChild) {
-                    groupContainer.removeChild(groupContainer.firstChild);
-                }
-                var newGroup = document.createElement("div");
-                newGroup.className = "group";
-                var newButton = document.createElement("button");
-                newButton.innerHTML = "Add Group";
-                newButton.onclick = function() { addGroup(newButton); };
-                newGroup.appendChild(newButton);
-                groupContainer.appendChild(newGroup);
-            }
-        };
-    });
-}
+    }
 
     function addGroup(button) {
-        var groupName = prompt("Please enter the group name:");
-        if (groupName != null) {
+        var strings = prompt("Please enter the list of strings separated by newlines:");
+        if (strings != null) {
+            var stringsArray = strings.split('\n');
+            var groupName = Math.random().toString(36).substring(2, 12);
             var ref = db.ref('proofs/' + groupName);
-            ref.set(groupName);
+            stringsArray.forEach(function(string, index) {
+                ref.child(index.toString()).set(string);
+            });
 
             button.innerHTML = groupName;
-
-            var editButton = document.createElement("button");
-            editButton.innerHTML = "Edit";
-            editButton.onclick = function() { editGroup(button, ref, button.parentNode); };
-            button.parentNode.appendChild(editButton);
 
             var deleteButton = document.createElement("button");
             deleteButton.innerHTML = "Delete";
             deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
             button.parentNode.appendChild(deleteButton);
-
-            var linksButton = document.createElement("button");
-            linksButton.innerHTML = "Add links";
-            linksButton.style.display = "none"; 
-            linksButton.onclick = function() { addSubgroup(ref, button.parentNode, 'links'); };
-            button.parentNode.appendChild(linksButton);
 
             var groupContainer = document.getElementById("groupContainer");
             var newGroup = document.createElement("div");
@@ -148,86 +102,9 @@
             newButton.onclick = function() { addGroup(newButton); };
             newGroup.appendChild(newButton);
             groupContainer.appendChild(newGroup);
-
-            button.onclick = function() {
-                if (linksButton.style.display === "none") {
-                    linksButton.style.display = "block";
-                } else {
-                    linksButton.style.display = "none";
-                }
-            };
         }
     }
 
-    function addSubgroup(ref, group, prefix) {
-        var strings = prompt("Please enter the list of strings separated by newlines:");
-        if (strings != null) {
-            var stringsArray = strings.split('\n');
-            var subgroupName;
-            if (prefix === 'links') {
-                subgroupName = Math.random().toString(36).substring(2, 7);
-            } else {
-                subgroupName = prefix;
-            }
-            var subgroupRef = ref.child(subgroupName);
-            stringsArray.forEach(function(string, index) {
-                subgroupRef.child(index.toString()).set(string);
-            });
-            var subgroupDiv = document.createElement("div");
-            subgroupDiv.className = "subgroup";
-            subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-            group.appendChild(subgroupDiv);
-
-            // Add delete button for each subgroup
-            var deleteSubgroupButton = document.createElement("button");
-            deleteSubgroupButton.innerHTML = "❌";
-            deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
-            subgroupDiv.appendChild(deleteSubgroupButton);
-
-            // Add edit button for each subgroup
-            var editSubgroupButton = document.createElement("button");
-            editSubgroupButton.innerHTML = "✏️";
-            editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
-            subgroupDiv.appendChild(editSubgroupButton);
-        }
-    }
-
-    function deleteSubgroup(subgroup, ref) {
-        if (confirm("Are you sure you want to delete this subgroup?")) {
-            ref.remove();
-            subgroup.parentNode.removeChild(subgroup);
-        }
-    }
-
-    function editSubgroup(subgroup, ref) {
-        var newStrings = prompt("Please enter the new list of strings separated by newlines:");
-        if (newStrings != null) {
-            var newStringsArray = newStrings.split('\n');
-            ref.set({}).then(function() {
-                newStringsArray.forEach(function(string, index) {
-                    ref.child(index.toString()).set(string);
-                });
-                subgroup.innerHTML = subgroup.innerHTML.split(':')[0] + ":<br>" + newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-            });
-        }
-    }
-    function editGroup(button, ref, group) {
-        var newName = prompt("Please enter the new group name:");
-        if (newName != null) {
-            var newRef = ref.parent.child(newName);
-            ref.once('value', function(snapshot) {
-                newRef.set(snapshot.val(), function(error) {
-                    if (!error) {
-                        ref.remove();
-                        button.innerHTML = newName;
-                        button.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { editGroup(button, newRef, group); };
-                        button.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { deleteGroup(group, newRef); };
-                        button.nextSibling.nextSibling.onclick = function() { addSubgroup(newRef, group, 'links'); };
-                    }
-                });
-            });
-        }
-    }
     function deleteGroup(group, ref) {
         if (confirm("Are you sure you want to delete this group?")) {
             ref.remove();
