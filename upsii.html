@@ -13,6 +13,10 @@
         .group {
             margin-bottom: 10px;
         }
+
+        .links {
+            display: none;
+        }
     </style>
     <script>
         var firebaseConfig = {
@@ -49,6 +53,19 @@
                 groupDiv.className = "group";
                 groupDiv.appendChild(groupButton);
                 document.getElementById("groupContainer").appendChild(groupDiv);
+
+                var linksDiv = document.createElement("div");
+                linksDiv.className = "links";
+                linksDiv.innerHTML = Object.entries(childData).map(([key, value]) => `${key}: ${value}`).join('<br>');
+                groupDiv.appendChild(linksDiv);
+
+                groupButton.onclick = function() {
+                    if (linksDiv.style.display === "none") {
+                        linksDiv.style.display = "block";
+                    } else {
+                        linksDiv.style.display = "none";
+                    }
+                };
 
                 var deleteButton = document.createElement("button");
                 deleteButton.innerHTML = "Delete";
@@ -88,6 +105,19 @@
             });
 
             button.innerHTML = groupName;
+
+            var linksDiv = document.createElement("div");
+            linksDiv.className = "links";
+            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+            button.parentNode.appendChild(linksDiv);
+
+            button.onclick = function() {
+                if (linksDiv.style.display === "none") {
+                    linksDiv.style.display = "block";
+                } else {
+                    linksDiv.style.display = "none";
+                }
+            };
 
             var deleteButton = document.createElement("button");
             deleteButton.innerHTML = "Delete";
