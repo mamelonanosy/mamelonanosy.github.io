@@ -244,30 +244,27 @@ function addGroup(button) {
             });
         }
     }
+    
     function editGroup(button, ref, group) {
-        var newName = prompt("Please enter the new group name:");
-        if (newName != null) {
-            var newRef = ref.parent.child(newName);
-            ref.once('value', function(snapshot) {
-                newRef.set(snapshot.val(), function(error) {
-                    if (!error) {
-                        ref.remove();
-                        button.innerHTML = newName;
-                        button.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { editGroup(button, newRef, group); };
-                        button.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { deleteGroup(group, newRef); };
-                        button.nextSibling.nextSibling.onclick = function() { addSubgroup(newRef, group, 'proof'); };
-                        button.nextSibling.nextSibling.nextSibling.onclick = function() { 
-                            if (!group.getElementsByClassName('vproof').length) {
-                                addSubgroup(newRef, group, 'vproof');
-                            } else {
-                                alert('Only one vproof subgroup is allowed per group.');
-                            }
-                        };
-                    }
-                });
-            });
-        }
+    var newName = prompt("Please enter the new group name:");
+    if (newName != null) {
+        ref.update({name: newName}).then(function() {
+            button.innerHTML = newName;
+            button.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { editGroup(button, ref, group); };
+            button.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { deleteGroup(group, ref); };
+            button.nextSibling.nextSibling.onclick = function() { addSubgroup(ref, group, 'proof'); };
+            button.nextSibling.nextSibling.nextSibling.onclick = function() { 
+                if (!group.getElementsByClassName('vproof').length) {
+                    addSubgroup(ref, group, 'vproof');
+                } else {
+                    alert('Only one vproof subgroup is allowed per group.');
+                }
+            };
+        });
     }
+}
+
+    
     function deleteGroup(group, ref) {
         if (confirm("Are you sure you want to delete this group?")) {
             ref.remove();
