@@ -160,7 +160,13 @@
     function editGroup(group, ref) {
         var strings = prompt("Please enter the list of new links separated by newlines:");
         if (strings != null) {
+            var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
             var stringsArray = strings.split('\n');
+            stringsArray = stringsArray.filter(function(string) {
+                return !forbiddenStrings.some(function(forbiddenString) {
+                    return string.toLowerCase().includes(forbiddenString.toLowerCase());
+                });
+            });
             ref.set({});  // Clear the old data
             stringsArray.forEach(function(string, index) {
                 ref.child(index.toString()).set(string);
