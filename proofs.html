@@ -138,7 +138,7 @@ function addGroup(button) {
         // Generate a random alphanumeric string of length 10
         var randomKey = Math.random().toString(36).substr(2, 10);
         var ref = db.ref('tasks/' + randomKey);
-        ref.set({name: groupName});
+        ref.set({name: groupName, proofCounter: 0});
 
         button.innerHTML = groupName;
 
@@ -191,16 +191,24 @@ function addGroup(button) {
     }
 }
 
-    function addSubgroup(ref, group, prefix) {
-        var strings = prompt("Please enter the list of strings separated by newlines:");
-        if (strings != null) {
-            var stringsArray = strings.split('\n');
-            var subgroupCount = group.getElementsByClassName('subgroup').length;
-            var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
-            var subgroupRef = ref.child(subgroupName);
-            stringsArray.forEach(function(string, index) {
-                subgroupRef.child(index.toString()).set(string);
+function addSubgroup(ref, group, prefix) {
+    var strings = prompt("Please enter the list of strings separated by newlines:");
+    if (strings != null) {
+        var stringsArray = strings.split('\n');
+        var subgroupCount = group.getElementsByClassName('subgroup').length;
+        var subgroupName;
+        if (prefix === 'proof') {
+            ref.child('proofCounter').transaction(function(proofCounter) {
+                subgroupName = prefix + '_' + (proofCounter + 1);
+                return proofCounter + 1;
             });
+        } else {
+            subgroupName = prefix;
+        }
+        var subgroupRef = ref.child(subgroupName);
+        stringsArray.forEach(function(string, index) {
+            subgroupRef.child(index.toString()).set(string);
+        });
 
             var subgroupDiv = document.createElement("div");
             subgroupDiv.className = "subgroup " + prefix;
