@@ -156,14 +156,15 @@ function editGroup(group, ref, editButton) {
         newEditButton.innerHTML = "Edit";
         newEditButton.onclick = function() { editGroup(group, ref, newEditButton); };
         
-        // Check if the old Edit button is still in the DOM
-        if (editButton.parentNode) {
+        // Check if the old Edit button is defined and still in the DOM
+        if (editButton && editButton.parentNode) {
             group.replaceChild(newEditButton, editButton);
         } else {
             group.appendChild(newEditButton);
         }
     }
 }
+
     function deleteGroup(group, ref) {
         if (confirm("Are you sure you want to delete this group?")) {
             ref.remove();
