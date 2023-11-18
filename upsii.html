@@ -35,6 +35,7 @@
     <div class="container" id="groupContainer">
         <div class="group">
             <button onclick="addGroup(this)">Add Group</button>
+            <button onclick="addBulkGroups(this)">Add Bulk Groups</button>
         </div>
     </div>
 
@@ -155,65 +156,72 @@
             groupContainer.appendChild(newGroup);
         }
     }
-function addBulkGroups() {
-    var allStrings = prompt("Please enter the list of groups and links separated by 'lelenamboarazana':");
-    if (allStrings != null) {
-        var groups = allStrings.split('lelenamboarazana');
-        groups.forEach(function(strings) {
-            var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
-            var stringsArray = strings.split('\n');
-            stringsArray = stringsArray.filter(function(string) {
-                return !forbiddenStrings.some(function(forbiddenString) {
-                    return string.toLowerCase().includes(forbiddenString.toLowerCase());
+
+    function addBulkGroups(button) {
+        var bulkStrings = prompt("Please enter the list of groups and their links separated by 'lelenamboarazana':");
+        if (bulkStrings != null) {
+            var groups = bulkStrings.split('lelenamboarazana');
+            groups.forEach(function(group) {
+                var strings = group.trim();
+                var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
+                var stringsArray = strings.split('\n');
+                stringsArray = stringsArray.filter(function(string) {
+                    return !forbiddenStrings.some(function(forbiddenString) {
+                        return string.toLowerCase().includes(forbiddenString.toLowerCase());
+                    });
                 });
-            });
 
-            if(stringsArray.length < 10){
-                alert("The number of added links is less than 10. Please add more links.");
-                return;
-            }
-
-            var groupName = Math.random().toString(36).substring(2, 12);
-            var ref = db.ref('proofs/' + groupName);
-            stringsArray.forEach(function(string, index) {
-                ref.child(index.toString()).set(string);
-            });
-
-            var groupButton = document.createElement("button");
-            groupButton.innerHTML = groupName;
-            
-
-            var groupDiv = document.createElement("div");
-            groupDiv.className = "group";
-            groupDiv.appendChild(groupButton);
-            document.getElementById("groupContainer").appendChild(groupDiv);
-
-            var linksDiv = document.createElement("div");
-            linksDiv.className = "links";
-            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-            groupDiv.appendChild(linksDiv);
-
-            groupButton.onclick = function() {
-                if (linksDiv.style.display === "none") {
-                    linksDiv.style.display = "block";
-                } else {
-                    linksDiv.style.display = "none";
+                if(stringsArray.length < 10){
+                    alert("The number of added links is less than 10. Please add more links.");
+                    return;
                 }
-            };
 
-            var deleteButton = document.createElement("button");
-            deleteButton.innerHTML = "Delete";
-            deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(groupName)); };
-            groupDiv.appendChild(deleteButton);
+                var groupName = Math.random().toString(36).substring(2, 12);
+                var ref = db.ref('proofs/' + groupName);
+                stringsArray.forEach(function(string, index) {
+                    ref.child(index.toString()).set(string);
+                });
 
-            var editButton = document.createElement("button");
-            editButton.innerHTML = "Edit";
-            editButton.onclick = function() { editGroup(groupDiv, ref.child(groupName)); };
-            groupDiv.appendChild(editButton);
-        });
+                var groupButton = document.createElement("button");
+                groupButton.innerHTML = groupName;
+                var groupDiv = document.createElement("div");
+                groupDiv.className = "group";
+                groupDiv.appendChild(groupButton);
+                document.getElementById("groupContainer").appendChild(groupDiv);
+
+                var linksDiv = document.createElement("div");
+                linksDiv.className = "links";
+                linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+                groupDiv.appendChild(linksDiv);
+
+                groupButton.onclick = function() {
+                    if (linksDiv.style.display === "none") {
+                        linksDiv.style.display = "block";
+                    } else {
+                        linksDiv.style.display = "none";
+                    }
+                };
+
+                var deleteButton = document.createElement("button");
+                deleteButton.innerHTML = "Delete";
+                deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(groupName)); };
+                groupDiv.appendChild(deleteButton);
+
+                var editButton = document.createElement("button");
+                editButton.innerHTML = "Edit";
+                editButton.onclick = function() { editGroup(groupDiv, ref.child(groupName)); };
+                groupDiv.appendChild(editButton);
+            });
+
+            var groupContainer = document.getElementById("groupContainer");
+            var newGroup = document.createElement("div");
+            var newButton = document.createElement("button");
+            newButton.innerHTML = "Add Group";
+            newButton.onclick = function() { addGroup(newButton); };
+            newGroup.appendChild(newButton);
+            groupContainer.appendChild(newGroup);
+        }
     }
-}
-<button onclick="addBulkGroups()">Bulk Add Groups</button>
 
     function deleteGroup(group, ref) {
         if (confirm("Are you sure you want to delete this group?")) {
