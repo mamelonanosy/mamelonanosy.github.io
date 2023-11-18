@@ -4,6 +4,16 @@
     <title>Simple Editable Text Website</title>
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .group {
+            margin-bottom: 10px;
+        }
+    </style>
     <script>
         var firebaseConfig = {
             apiKey: "AIzaSyBKtqcRTqmwOn758IA3nOGIRzV7Qk_kG2Q",
@@ -15,231 +25,253 @@
             appId: "1:861003739122:web:0866a42e4bbcc36d54056b"
         };
         firebase.initializeApp(firebaseConfig);
-        var database = firebase.database();
     </script>
 </head>
 <body>
-    <div id="groups"></div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+    <div class="container" id="groupContainer">
+        <div class="group">
+            <button onclick="addGroup(this)">Add Group</button>
+        </div>
+    </div>
 
-    function checkLink(link) {
-        let forbiddenWords = ['br', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements'];
-        return !forbiddenWords.some(word => link.includes(word));
-    }
+<script>
+    var db = firebase.database();
+    var proofCounter = 0;
 
-    database.ref('br').once('value').then((snapshot) => {
-        let links = snapshot.val();
-        if (!links) {
-            links = {};
-        }
+    window.onload = function() {
+    var ref = db.ref('tasks');
+    ref.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            var childKey = childSnapshot.key;
+            var childData = childSnapshot.val();
+            var groupButton = document.createElement("button");
+            groupButton.innerHTML = childKey;
+            var groupDiv = document.createElement("div");
+            groupDiv.className = "group";
+            groupDiv.appendChild(groupButton);
+            document.getElementById("groupContainer").appendChild(groupDiv);
+            childSnapshot.forEach(function(subgroupSnapshot) {
+                var subgroupKey = subgroupSnapshot.key;
+                var subgroupData = subgroupSnapshot.val();
+                var subgroupDiv = document.createElement("div");
+                subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'v_proof');
+                subgroupDiv.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
+                groupDiv.appendChild(subgroupDiv);
 
-        let groupsDiv = document.getElementById('groups');
-        let keys = Object.keys(links);
+                // Add delete button for each subgroup
+                var deleteSubgroupButton = document.createElement("button");
+                deleteSubgroupButton.innerHTML = "❌";
+                deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
+                subgroupDiv.appendChild(deleteSubgroupButton);
 
-        keys.forEach((key, index) => {
-            let groupDiv = document.createElement('div');
-            groupDiv.className = 'group';
+                // Add edit button for each subgroup
+                var editSubgroupButton = document.createElement("button");
+                editSubgroupButton.innerHTML = "✏️";
+                editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
+                subgroupDiv.appendChild(editSubgroupButton);
+            });
 
-            let groupName = document.createElement('button');
-            let linkCount = br[key].length;
-            groupName.textContent = `${index + 1}. ${key} (${linkCount})`;
-            if (linkCount <= 1) {
-                groupName.style.color = 'red';
-                groupName.style.fontWeight = 'bold';
-            }
-            groupDiv.appendChild(groupName);
-            let editButton = document.createElement('button');
-            editButton.textContent = 'Edit';
+            var editButton = document.createElement("button");
+            editButton.innerHTML = "Edit";
+            editButton.onclick = function() { editGroup(groupButton, ref.child(childKey), groupDiv); };
             groupDiv.appendChild(editButton);
 
-            let deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
+            var deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "Delete";
+            deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
             groupDiv.appendChild(deleteButton);
 
-            let linksDiv = document.createElement('div');
-            linksDiv.className = 'links';
+            var subgroupButton = document.createElement("button");
+            subgroupButton.innerHTML = "Add proof";
+            subgroupButton.style.display = "none"; 
+            subgroupButton.onclick = function() { addSubgroup(ref.child(childKey), groupDiv, 'proof'); };
+            groupDiv.appendChild(subgroupButton);
 
-            br[key].forEach((link, linkIndex) => {
-                let linkDiv = document.createElement('div');
-
-                let linkP = document.createElement('p');
-                linkP.textContent = link;
-                if (linkIndex < 3) {
-                    linkP.style.color = 'blue';
-                }
-                linkDiv.appendChild(linkP);
-
-                let editLinkButton = document.createElement('button');
-                editLinkButton.textContent = 'Edit Link';
-                linkDiv.appendChild(editLinkButton);
-
-                let deleteLinkButton = document.createElement('button');
-                deleteLinkButton.textContent = 'Delete Link';
-                linkDiv.appendChild(deleteLinkButton);
-
-                linksDiv.appendChild(linkDiv);
-
-                editLinkButton.addEventListener('click', function() {
-                    let newLink = prompt('Enter new URL for the link:');
-                    if (newLink && checkLink(newLink)) {
-                        br[key][linkIndex] = newLink;
-                        let saveObject = {};
-                        saveObject['links'] = links;
-                        database.ref('br/').set(saveObject).then(() => {
-                            location.reload();
-                        });
-                    }
-                });
-
-                deleteLinkButton.addEventListener('click', function() {
-                    if (confirm(`Are you sure you want to delete the link ${link}?`)) {
-                        br[key].splice(linkIndex, 1);
-                        let saveObject = {};
-                        saveObject['links'] = links;
-                        database.ref('br/').set(saveObject).then(() => {
-                            location.reload();
-                        });
-                    }
-                });
-
-                if (linkIndex === 2) {
-                    let addPrimaryLinkButton = document.createElement('button');
-                    addPrimaryLinkButton.textContent = 'Add Primary Link';
-                    linkDiv.appendChild(addPrimaryLinkButton);
-                    
-                    addPrimaryLinkButton.addEventListener('click', function() {
-                        let newPrimaryLinks = prompt('Enter new primary links (separated by newlines):');
-                        if (newPrimaryLinks) {
-                            newPrimaryLinks = newPrimaryLinks.trim().split('\n').map(link => link.trim());
-                            newPrimaryLinks = newPrimaryLinks.filter(checkLink);
-                            newPrimaryLinks = newPrimaryLinks.filter(link => !br[key].includes(link));
-
-                            if (br[key].length === 1 && br[key][0] === 'http://placeholder.com') {
-                                br[key] = [];
-                            }
-
-                            br[key].splice(2, 0, ...newPrimaryLinks); 
-                            let saveObject = {};
-                            saveObject['links'] = links;
-                            database.ref('br/').set(saveObject).then(() => {
-                                location.reload();
-                            });
-                        }
-                    });
-                }
-
-                if (linkIndex === br[key].length - 1) {
-                    let addRotatingLinkButton = document.createElement('button');
-                    addRotatingLinkButton.textContent = 'Add Rotating Link';
-                    linkDiv.appendChild(addRotatingLinkButton);
-
-                    addRotatingLinkButton.addEventListener('click', function() {
-                        let newRotatingLinks = prompt('Enter new rotating links (separated by newlines):');
-                        if (newRotatingLinks) {
-                            newRotatingLinks = newRotatingLinks.trim().split('\n').map(link => link.trim());
-                            newRotatingLinks = newRotatingLinks.filter(checkLink);
-                            newRotatingLinks = newRotatingLinks.filter(link => !br[key].includes(link));
-
-                            if (br[key].length === 1 && br[key][0] === 'http://placeholder.com') {
-                                br[key] = [];
-                            }
-
-                            br[key].push(...newRotatingLinks); 
-                            let saveObject = {};
-                            saveObject['links'] = links;
-                            database.ref('br/').set(saveObject).then(() => {
-                                location.reload();
-                            });
-                        }
-                    });
-                }
-            });
-
-            groupDiv.appendChild(linksDiv);
-
-            groupName.addEventListener('click', function() {
-                linksDiv.style.display = linksDiv.style.display === 'none' ? 'block' : 'none';
-            });
-
-            editButton.addEventListener('click', function() {
-                let newName = prompt('Enter new name for the group:');
-                if (newName) {
-                    br[newName] = br[key];
-                    delete br[key];
-                    let saveObject = {};
-                    saveObject['links'] = links;
-                    database.ref('br/').set(saveObject).then(() => {
-                        location.reload();
-                    });
-                }
-            });
-
-            deleteButton.addEventListener('click', function() {
-                if (confirm(`Are you sure you want to delete the group ${key}?`)) {
-                    delete br[key];
-                    let saveObject = {};
-                    saveObject['links'] = links;
-                    database.ref('br/').set(saveObject).then(() => {
-                        location.reload();
-                    });
-                }
-            });
-
-            groupsDiv.appendChild(groupDiv);
-        });
-
-        let addGroupButton = document.createElement('button');
-        addGroupButton.textContent = 'Add Group';
-        groupsDiv.appendChild(addGroupButton);
-
-        addGroupButton.addEventListener('click', function() {
-            let newGroupName = prompt('Enter new group name:');
-            if (newGroupName) {
-                if (br[newGroupName]) {
-                    alert('This group already exists!');
+            var vProofButton = document.createElement("button");
+            vProofButton.innerHTML = "Add v_proof";
+            vProofButton.style.display = "none"; 
+            vProofButton.onclick = function() { 
+                if (!groupDiv.getElementsByClassName('v_proof').length) {
+                    addSubgroup(ref.child(childKey), groupDiv, 'v_proof');
                 } else {
-                    br[newGroupName] = ['http://placeholder.com'];
-                    let saveObject = {};
-                    saveObject['links'] = links;
-                    database.ref('br/').set(saveObject).then(() => {
-                        location.reload();
-                    });
+                    alert('Only one v_proof subgroup is allowed per group.');
                 }
-            }
+            };
+            groupDiv.appendChild(vProofButton);
+
+            groupButton.onclick = function() {
+                if (subgroupButton.style.display === "none") {
+                    subgroupButton.style.display = "block";
+                    vProofButton.style.display = "block";
+                } else {
+                    subgroupButton.style.display = "none";
+                    vProofButton.style.display = "none";
+                }
+            };
         });
 
-        let addBulkGroupButton = document.createElement('button');
-        addBulkGroupButton.textContent = 'Bulk Add Group and Links';
-        groupsDiv.appendChild(addBulkGroupButton);
+        var deleteAllButton = document.getElementById("deleteAllButton");
+        deleteAllButton.onclick = function() {
+            if (confirm("Are you sure you want to delete all data?")) {
+                var ref = db.ref('tasks');
+                ref.remove();
+                var groupContainer = document.getElementById("groupContainer");
+                while (groupContainer.firstChild) {
+                    groupContainer.removeChild(groupContainer.firstChild);
+                }
+                var newGroup = document.createElement("div");
+                newGroup.className = "group";
+                var newButton = document.createElement("button");
+                newButton.innerHTML = "Add Group";
+                newButton.onclick = function() { addGroup(newButton); };
+                newGroup.appendChild(newButton);
+                groupContainer.appendChild(newGroup);
+            }
+        };
+    });
+}
 
-        addBulkGroupButton.addEventListener('click', function() {
-            let newGroups = prompt('Enter new groups and links (each group starts with group name, followed by links separated by newlines. Different groups are separated by lelenamboarazana):');
-            if (newGroups) {
-                newGroups = newGroups.trim().split('lelenamboarazana').map(group => group.trim().split('\n').map(link => link.trim()));
-                newGroups.forEach(group => {
-                    let groupName = group[0];
-                    let groupLinks = group.slice(1);
-                    if (br[groupName]) {
-                        alert(`The group ${groupName} already exists!`);
-                    } else {
-                        groupLinks = groupLinks.filter(checkLink);
-                        if (groupLinks.length === 0) {
-                            alert(`No valid links provided for the group ${groupName}!`);
-                        } else {
-                            br[groupName] = groupLinks;
-                            let saveObject = {};
-                            saveObject['links'] = links;
-                            database.ref('br/').set(saveObject).then(() => {
-                                location.reload();
-                            });
-                        }
+    function addGroup(button) {
+        var groupName = prompt("Please enter the group name:");
+        if (groupName != null) {
+            var ref = db.ref('tasks/' + groupName);
+            ref.set(groupName);
+
+            button.innerHTML = groupName;
+
+            var editButton = document.createElement("button");
+            editButton.innerHTML = "Edit";
+            editButton.onclick = function() { editGroup(button, ref, button.parentNode); };
+            button.parentNode.appendChild(editButton);
+
+            var deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "Delete";
+            deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
+            button.parentNode.appendChild(deleteButton);
+
+            var subgroupButton = document.createElement("button");
+            subgroupButton.innerHTML = "Add proof";
+            subgroupButton.style.display = "none"; 
+            subgroupButton.onclick = function() { addSubgroup(ref, button.parentNode, 'proof'); };
+            button.parentNode.appendChild(subgroupButton);
+
+            var vProofButton = document.createElement("button");
+            vProofButton.innerHTML = "Add v_proof";
+            vProofButton.style.display = "none"; 
+            vProofButton.onclick = function() { 
+                if (!button.parentNode.getElementsByClassName('v_proof').length) {
+                    addSubgroup(ref, button.parentNode, 'v_proof');
+                } else {
+                    alert('Only one v_proof subgroup is allowed per group.');
+                }
+            };
+            button.parentNode.appendChild(vProofButton);
+
+            var groupContainer = document.getElementById("groupContainer");
+            var newGroup = document.createElement("div");
+            newGroup.className = "group";
+            var newButton = document.createElement("button");
+            newButton.innerHTML = "Add Group";
+            newButton.onclick = function() { addGroup(newButton); };
+            newGroup.appendChild(newButton);
+            groupContainer.appendChild(newGroup);
+
+            button.onclick = function() {
+                if (subgroupButton.style.display === "none") {
+                    subgroupButton.style.display = "block";
+                    vProofButton.style.display = "block";
+                } else {
+                    subgroupButton.style.display = "none";
+                    vProofButton.style.display = "none";
+                }
+            };
+        }
+    }
+
+    function addSubgroup(ref, group, prefix) {
+        var strings = prompt("Please enter the list of strings separated by newlines:");
+        if (strings != null) {
+            var stringsArray = strings.split('\n');
+            var subgroupCount = group.getElementsByClassName('subgroup').length;
+            var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
+            var subgroupRef = ref.child(subgroupName);
+            stringsArray.forEach(function(string, index) {
+                subgroupRef.child(index.toString()).set(string);
+            });
+
+            var subgroupDiv = document.createElement("div");
+            subgroupDiv.className = "subgroup " + prefix;
+            subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+            group.appendChild(subgroupDiv);
+
+            // Add delete button for each subgroup
+            var deleteSubgroupButton = document.createElement("button");
+            deleteSubgroupButton.innerHTML = "❌";
+            deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
+            subgroupDiv.appendChild(deleteSubgroupButton);
+
+            // Add edit button for each subgroup
+            var editSubgroupButton = document.createElement("button");
+            editSubgroupButton.innerHTML = "✏️";
+            editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
+            subgroupDiv.appendChild(editSubgroupButton);
+
+            if (prefix === 'proof') {
+                proofCounter++;
+            }
+        }
+    }
+
+    function deleteSubgroup(subgroup, ref) {
+        if (confirm("Are you sure you want to delete this subgroup?")) {
+            ref.remove();
+            subgroup.parentNode.removeChild(subgroup);
+        }
+    }
+
+    function editSubgroup(subgroup, ref) {
+        var newStrings = prompt("Please enter the new list of strings separated by newlines:");
+        if (newStrings != null) {
+            var newStringsArray = newStrings.split('\n');
+            ref.set({}).then(function() {
+                newStringsArray.forEach(function(string, index) {
+                    ref.child(index.toString()).set(string);
+                });
+                subgroup.innerHTML = subgroup.innerHTML.split(':')[0] + ":<br>" + newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+            });
+        }
+    }
+    function editGroup(button, ref, group) {
+        var newName = prompt("Please enter the new group name:");
+        if (newName != null) {
+            var newRef = ref.parent.child(newName);
+            ref.once('value', function(snapshot) {
+                newRef.set(snapshot.val(), function(error) {
+                    if (!error) {
+                        ref.remove();
+                        button.innerHTML = newName;
+                        button.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { editGroup(button, newRef, group); };
+                        button.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { deleteGroup(group, newRef); };
+                        button.nextSibling.nextSibling.onclick = function() { addSubgroup(newRef, group, 'proof'); };
+                        button.nextSibling.nextSibling.nextSibling.onclick = function() { 
+                            if (!group.getElementsByClassName('v_proof').length) {
+                                addSubgroup(newRef, group, 'v_proof');
+                            } else {
+                                alert('Only one v_proof subgroup is allowed per group.');
+                            }
+                        };
                     }
                 });
-            }
-        });
-    });
-});
-    </script>
+            });
+        }
+    }
+    function deleteGroup(group, ref) {
+        if (confirm("Are you sure you want to delete this group?")) {
+            ref.remove();
+            group.parentNode.removeChild(group);
+        }
+    }
+</script>
+<button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
 </body>
 </html>
