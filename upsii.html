@@ -102,13 +102,17 @@
     function addGroup(button) {
         var strings = prompt("Please enter the list of strings separated by newlines:");
         if (strings != null) {
+            var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
             var stringsArray = strings.split('\n');
+            stringsArray = stringsArray.filter(function(string) {
+                return !forbiddenStrings.some(function(forbiddenString) {
+                    return string.toLowerCase().includes(forbiddenString.toLowerCase());
+                });
+            });
             var groupName = Math.random().toString(36).substring(2, 12);
             var ref = db.ref('proofs/' + groupName);
             stringsArray.forEach(function(string, index) {
-                if (checkLink(string)) {
-                    ref.child(index.toString()).set(string);
-                }
+                ref.child(index.toString()).set(string);
             });
 
             button.innerHTML = groupName;
@@ -138,7 +142,6 @@
 
             var groupContainer = document.getElementById("groupContainer");
             var newGroup = document.createElement("div");
-            newGroup.className = "group";
             var newButton = document.createElement("button");
             newButton.innerHTML = "Add Group";
             newButton.onclick = function() { addGroup(newButton); };
@@ -160,19 +163,12 @@
             var stringsArray = strings.split('\n');
             ref.set({});  // Clear the old data
             stringsArray.forEach(function(string, index) {
-                if (checkLink(string)) {
-                    ref.child(index.toString()).set(string);
-                }
+                ref.child(index.toString()).set(string);
             });
 
             var linksDiv = group.getElementsByClassName("links")[0];
             linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
         }
-    }
-
-    function checkLink(link) {
-        let forbiddenWords = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
-        return !forbiddenWords.some(word => link.toLowerCase().includes(word.toLowerCase()));
     }
 </script>
 <button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
