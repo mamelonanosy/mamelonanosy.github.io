@@ -53,6 +53,7 @@
             childSnapshot.forEach(function(subgroupSnapshot) {
                 var subgroupKey = subgroupSnapshot.key;
                 var subgroupData = subgroupSnapshot.val();
+                if (subgroupKey === 'name') return;
                 var subgroupDiv = document.createElement("div");
                 subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'vproof');
                 subgroupDiv.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
