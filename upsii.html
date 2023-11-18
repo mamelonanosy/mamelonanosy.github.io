@@ -109,6 +109,12 @@
                     return string.toLowerCase().includes(forbiddenString.toLowerCase());
                 });
             });
+            
+            if(stringsArray.length < 10){
+                alert("The number of added links is less than 10. Please add more links.");
+                return;
+            }
+
             var groupName = Math.random().toString(36).substring(2, 12);
             var ref = db.ref('proofs/' + groupName);
             stringsArray.forEach(function(string, index) {
