@@ -45,7 +45,7 @@
             var childKey = childSnapshot.key;
             var childData = childSnapshot.val();
             var groupButton = document.createElement("button");
-            groupButton.innerHTML = childKey;
+            groupButton.innerHTML = childData.name || childKey;
             var groupDiv = document.createElement("div");
             groupDiv.className = "group";
             groupDiv.appendChild(groupButton);
