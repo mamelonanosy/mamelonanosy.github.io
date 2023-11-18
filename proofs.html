@@ -54,7 +54,7 @@
                 var subgroupKey = subgroupSnapshot.key;
                 var subgroupData = subgroupSnapshot.val();
                 var subgroupDiv = document.createElement("div");
-                subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'v_proof');
+                subgroupDiv.className = "subgroup " + (subgroupKey.includes('proof') ? 'proof' : 'vproof');
                 subgroupDiv.innerHTML = subgroupKey + ":<br>" + Object.entries(subgroupData).map(([key, value]) => `${key}: ${value}`).join('<br>');
                 groupDiv.appendChild(subgroupDiv);
 
@@ -88,13 +88,13 @@
             groupDiv.appendChild(subgroupButton);
 
             var vProofButton = document.createElement("button");
-            vProofButton.innerHTML = "Add v_proof";
+            vProofButton.innerHTML = "Add vproof";
             vProofButton.style.display = "none"; 
             vProofButton.onclick = function() { 
-                if (!groupDiv.getElementsByClassName('v_proof').length) {
-                    addSubgroup(ref.child(childKey), groupDiv, 'v_proof');
+                if (!groupDiv.getElementsByClassName('vproof').length) {
+                    addSubgroup(ref.child(childKey), groupDiv, 'vproof');
                 } else {
-                    alert('Only one v_proof subgroup is allowed per group.');
+                    alert('Only one vproof subgroup is allowed per group.');
                 }
             };
             groupDiv.appendChild(vProofButton);
@@ -156,13 +156,13 @@
             button.parentNode.appendChild(subgroupButton);
 
             var vProofButton = document.createElement("button");
-            vProofButton.innerHTML = "Add v_proof";
+            vProofButton.innerHTML = "Add vproof";
             vProofButton.style.display = "none"; 
             vProofButton.onclick = function() { 
-                if (!button.parentNode.getElementsByClassName('v_proof').length) {
-                    addSubgroup(ref, button.parentNode, 'v_proof');
+                if (!button.parentNode.getElementsByClassName('vproof').length) {
+                    addSubgroup(ref, button.parentNode, 'vproof');
                 } else {
-                    alert('Only one v_proof subgroup is allowed per group.');
+                    alert('Only one vproof subgroup is allowed per group.');
                 }
             };
             button.parentNode.appendChild(vProofButton);
@@ -254,10 +254,10 @@
                         button.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { deleteGroup(group, newRef); };
                         button.nextSibling.nextSibling.onclick = function() { addSubgroup(newRef, group, 'proof'); };
                         button.nextSibling.nextSibling.nextSibling.onclick = function() { 
-                            if (!group.getElementsByClassName('v_proof').length) {
-                                addSubgroup(newRef, group, 'v_proof');
+                            if (!group.getElementsByClassName('vproof').length) {
+                                addSubgroup(newRef, group, 'vproof');
                             } else {
-                                alert('Only one v_proof subgroup is allowed per group.');
+                                alert('Only one vproof subgroup is allowed per group.');
                             }
                         };
                     }
