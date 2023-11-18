@@ -181,6 +181,7 @@ function addBulkGroups() {
 
             var groupButton = document.createElement("button");
             groupButton.innerHTML = groupName;
+            
 
             var groupDiv = document.createElement("div");
             groupDiv.className = "group";
@@ -212,6 +213,7 @@ function addBulkGroups() {
         });
     }
 }
+<button onclick="addBulkGroups()">Bulk Add Groups</button>
 
     function deleteGroup(group, ref) {
         if (confirm("Are you sure you want to delete this group?")) {
