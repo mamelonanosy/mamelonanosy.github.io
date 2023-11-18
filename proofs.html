@@ -245,15 +245,20 @@ function addGroup(button) {
         }
     }
     
-    function editGroup(button, ref, group) {
+function editGroup(button, ref, group) {
     var newName = prompt("Please enter the new group name:");
     if (newName != null) {
         ref.update({name: newName}).then(function() {
             button.innerHTML = newName;
             button.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { editGroup(button, ref, group); };
             button.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.onclick = function() { deleteGroup(group, ref); };
-            button.nextSibling.nextSibling.onclick = function() { addSubgroup(ref, group, 'proof'); };
-            button.nextSibling.nextSibling.nextSibling.onclick = function() { 
+            
+            // Correctly update the onclick event handlers for the "Add proof" and "Add vproof" buttons
+            var proofButton = group.querySelector('button:contains("Add proof")');
+            proofButton.onclick = function() { addSubgroup(ref, group, 'proof'); };
+            
+            var vProofButton = group.querySelector('button:contains("Add vproof")');
+            vProofButton.onclick = function() { 
                 if (!group.getElementsByClassName('vproof').length) {
                     addSubgroup(ref, group, 'vproof');
                 } else {
