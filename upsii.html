@@ -32,6 +32,7 @@
     </script>
 </head>
 <body>
+    <div id="stats"></div>
     <div class="container" id="groupContainer">
         <div class="group">
             <button onclick="addGroup(this)">Add Group</button>
@@ -97,6 +98,7 @@
                     groupContainer.appendChild(newGroup);
                 }
             };
+            updateStats();
         });
     }
 
@@ -154,6 +156,7 @@
             newButton.onclick = function() { addGroup(newButton); };
             newGroup.appendChild(newButton);
             groupContainer.appendChild(newGroup);
+            updateStats();
         }
     }
 
@@ -220,6 +223,7 @@
             newButton.onclick = function() { addGroup(newButton); };
             newGroup.appendChild(newButton);
             groupContainer.appendChild(newGroup);
+            updateStats();
         }
     }
 
@@ -227,8 +231,10 @@
         if (confirm("Are you sure you want to delete this group?")) {
             ref.remove();
             group.parentNode.removeChild(group);
+            updateStats();
         }
     }
+
     function editGroup(group, ref) {
         var strings = prompt("Please enter the list of new links separated by newlines:");
         if (strings != null) {
@@ -236,7 +242,7 @@
             var stringsArray = strings.split('\n');
             stringsArray = stringsArray.filter(function(string) {
                 return !forbiddenStrings.some(function(forbiddenString) {
-                    return string.toLowerCase().includes(forbiddenString.toLowerCase());
+                 return string.toLowerCase().includes(forbiddenString.toLowerCase());
                 });
             });
             ref.set({});  // Clear the old data
@@ -246,7 +252,14 @@
 
             var linksDiv = group.getElementsByClassName("links")[0];
             linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+            updateStats();
         }
+    }
+
+    function updateStats() {
+        var groups = document.getElementsByClassName('group').length;
+        var links = document.getElementsByClassName('links').length;
+        document.getElementById('stats').innerHTML = "Total Groups: " + groups + ", Total Links: " + links;
     }
 </script>
 <button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
