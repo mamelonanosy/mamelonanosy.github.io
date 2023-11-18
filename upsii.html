@@ -140,7 +140,7 @@
     }
 }
 
-function editGroup(group, ref) {
+function editGroup(group, ref, editButton) {
     var newStrings = prompt("Please enter the new list of strings separated by newlines:");
     if (newStrings != null) {
         var newStringsArray = newStrings.split('\n');
@@ -150,6 +150,12 @@ function editGroup(group, ref) {
         });
         var linksDiv = group.getElementsByClassName("links")[0];
         linksDiv.innerHTML = newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+        
+        // Re-create the Edit button
+        var newEditButton = document.createElement("button");
+        newEditButton.innerHTML = "Edit";
+        newEditButton.onclick = function() { editGroup(group, ref, newEditButton); };
+        group.replaceChild(newEditButton, editButton);
     }
 }
 
