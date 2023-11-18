@@ -155,7 +155,13 @@ function addGroup(button) {
         var subgroupButton = document.createElement("button");
         subgroupButton.innerHTML = "Add proof";
         subgroupButton.style.display = "none"; 
-        subgroupButton.onclick = function() { addSubgroup(ref, button.parentNode, 'proof'); };
+
+        // Initialize a proof counter for this group
+        var groupProofCounter = 0;
+        subgroupButton.onclick = function() { 
+            groupProofCounter++;
+            addSubgroup(ref, button.parentNode, 'proof_' + groupProofCounter); 
+        };
         button.parentNode.appendChild(subgroupButton);
 
         var vProofButton = document.createElement("button");
