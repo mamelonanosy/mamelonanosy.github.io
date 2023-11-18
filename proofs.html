@@ -200,6 +200,10 @@ function addSubgroup(ref, group, prefix) {
         if (prefix === 'proof') {
             ref.child('proofCounter').transaction(function(proofCounter) {
                 subgroupName = prefix + '_' + (proofCounter + 1);
+                var subgroupRef = ref.child(subgroupName);
+                stringsArray.forEach(function(string, index) {
+                    subgroupRef.child(index.toString()).set(string);
+                });
                 return proofCounter + 1;
             });
         } else {
