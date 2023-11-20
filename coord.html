@@ -29,11 +29,37 @@
             var output = "";
             var i = 1;
             for (var key in coord) {
-                output += i + "." + key + ":" + coord[key] + "<br>";
+                output += i + "." + key + ":" + coord[key] + 
+                " <button onclick='editValue(\"" + key + "\")'>Edit Value</button>" +
+                " <button onclick='deleteValue(\"" + key + "\")'>Delete Value</button>" +
+                " <button onclick='deleteKey(\"" + key + "\")'>Delete Key</button><br>";
                 i++;
             }
             document.getElementById("lastInput").innerHTML = output;
         });
+
+        function editValue(key) {
+            var newValue = prompt("Enter the new value for " + key);
+            var update = {};
+            update[key] = newValue;
+            ref.update(update);
+        }
+
+        function deleteValue(key) {
+            var confirmDelete = confirm("Are you sure you want to delete the value for " + key + "?");
+            if (confirmDelete) {
+                var update = {};
+                update[key] = null;
+                ref.update(update);
+            }
+        }
+
+        function deleteKey(key) {
+            var confirmDelete = confirm("Are you sure you want to delete " + key + "?");
+            if (confirmDelete) {
+                ref.child(key).remove();
+            }
+        }
     </script>
 </body>
 </html>
