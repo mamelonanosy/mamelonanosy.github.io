@@ -49,7 +49,7 @@
             var confirmDelete = confirm("Are you sure you want to delete the value for " + key + "?");
             if (confirmDelete) {
                 var update = {};
-                update[key] = null;
+                update[key] = "";
                 ref.update(update);
             }
         }
