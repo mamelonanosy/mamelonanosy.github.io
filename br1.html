@@ -58,7 +58,7 @@
 
                 var linksDiv = document.createElement("div");
                 linksDiv.className = "links";
-                linksDiv.innerHTML = Object.entries(childData).map(([key, value]) => `${key}: ${value}`).join('<br1>');
+                linksDiv.innerHTML = Object.entries(childData).map(([key, value]) => `${key}: ${value}`).join('<br>');
                 groupDiv.appendChild(linksDiv);
 
                 groupButton.onclick = function() {
@@ -128,7 +128,7 @@
 
             var linksDiv = document.createElement("div");
             linksDiv.className = "links";
-            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br1>');
+            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
             button.parentNode.appendChild(linksDiv);
 
             button.onclick = function() {
@@ -194,7 +194,7 @@
 
                 var linksDiv = document.createElement("div");
                 linksDiv.className = "links";
-                linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br1>');
+                linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
                 groupDiv.appendChild(linksDiv);
 
                 groupButton.onclick = function() {
@@ -251,7 +251,7 @@
             });
 
             var linksDiv = group.getElementsByClassName("links")[0];
-            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br1>');
+            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
             updateStats();
         }
     }
