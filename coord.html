@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coordinator</title>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <style>
+        /* Add styles for the checkmark */
+        .checkmark {
+            display: none;
+            color: green; /* Change the color to green */
+            font-size: 20px;
+        }
+
+        /* Add styles for the container */
+        .container {
+            display: flex; /* Make the children align horizontally */
+        }
+
+        /* Add styles for the button */
+        #inputButton {
+            margin-right: 10px; /* Add some space between the button and the checkmark */
+        }
+    </style>
+    <script>
+        var firebaseConfig = {
+  apiKey: "AIzaSyDL8Ewtg32GWizNxGsMEylcpJOJ5Cib6PA",
+  authDomain: "automation-6385e.firebaseapp.com",
+  databaseURL: "https://automation-6385e-default-rtdb.firebaseio.com",
+  projectId: "automation-6385e",
+  storageBucket: "automation-6385e.appspot.com",
+  messagingSenderId: "305579155716",
+  appId: "1:305579155716:web:39c1835fbbb57031a9b051"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <button onclick="inputStrings()" id="inputButton">Input Strings</button>
+        <span class="checkmark" id="checkmark">✅</span>
+    </div>
+    <div id="lastInput"></div>
+
+    <script>
+        var db = firebase.database();
+        var ref = db.ref('coord');
+        ref.on('value', function(snapshot) {
+            var coord = snapshot.val();
+            document.getElementById("lastInput").innerHTML = coord;
+        });
+
+function inputStrings() {
+    var coord = prompt("Enter the strings separated by newlines");
+    coord = coord.replace(/(?<=%).*?(?=[0-9])/gs, ',');
+    ref.set(coord).then(function() {
+        showCheckmark();
+    });
+}
+        function showCheckmark() {
+            var inputButton = document.getElementById("inputButton");
+            var checkmark = document.getElementById("checkmark");
+
+            // Hide the input button and show the checkmark
+            inputButton.style.display = "none";
+            checkmark.style.display = "inline";
+
+            setTimeout(function(){ 
+                // Hide the checkmark and show the input button after 2 seconds
+                checkmark.style.display = "none"; 
+                inputButton.style.display = "inline";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
