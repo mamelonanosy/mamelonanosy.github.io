@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple Editable Text Website</title>
+    <title>Proofs</title>
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
     <style>
@@ -100,19 +100,16 @@
             };
             groupDiv.appendChild(vProofButton);
 
-groupButton.onclick = function() {
-    var displayStyle = subgroupButton.style.display === "none" ? "block" : "none";
-    subgroupButton.style.display = displayStyle;
-    vProofButton.style.display = displayStyle;
-
-    // Add this loop to hide/show all children of the group
-    for (var i = 0; i < groupDiv.children.length; i++) {
-        if (groupDiv.children[i] !== groupButton && groupDiv.children[i] !== subgroupButton && groupDiv.children[i] !== vProofButton) {
-            groupDiv.children[i].style.display = displayStyle;
-        }
-    }
-};
-
+            groupButton.onclick = function() {
+                if (subgroupButton.style.display === "none") {
+                    subgroupButton.style.display = "block";
+                    vProofButton.style.display = "block";
+                } else {
+                    subgroupButton.style.display = "none";
+                    vProofButton.style.display = "none";
+                }
+            };
+        });
 
         var deleteAllButton = document.getElementById("deleteAllButton");
         deleteAllButton.onclick = function() {
