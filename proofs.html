@@ -100,17 +100,25 @@
             };
             groupDiv.appendChild(vProofButton);
 
-            groupButton.onclick = function() {
-                if (subgroupButton.style.display === "none") {
-                    subgroupButton.style.display = "block";
-                    vProofButton.style.display = "block";
-                } else {
-                    subgroupButton.style.display = "none";
-                    vProofButton.style.display = "none";
-                }
-            };
+groupButton.onclick = function() {
+    if (subgroupButton.style.display === "none") {
+        subgroupButton.style.display = "block";
+        vProofButton.style.display = "block";
+        Array.from(groupDiv.children).forEach(child => {
+            if (child !== groupButton && child !== subgroupButton && child !== vProofButton) {
+                child.style.display = "block";
+            }
         });
-
+    } else {
+        subgroupButton.style.display = "none";
+        vProofButton.style.display = "none";
+        Array.from(groupDiv.children).forEach(child => {
+            if (child !== groupButton && child !== subgroupButton && child !== vProofButton) {
+                child.style.display = "none";
+            }
+        });
+    }
+};
         var deleteAllButton = document.getElementById("deleteAllButton");
         deleteAllButton.onclick = function() {
             if (confirm("Are you sure you want to delete all data?")) {
