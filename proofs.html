@@ -135,6 +135,7 @@
 var nodeCounter = 0;
 var nodeLimit = 3;
 var nodeRef = db.ref('tasks_' + nodeCounter);
+var tasksCountRef = db.ref('tasksCount');
 
 function addGroup(button) {
     var groupName = prompt("Please enter the group name:");
@@ -145,6 +146,11 @@ function addGroup(button) {
                 // If the current node is full, increment the counter and create a new node
                 nodeCounter++;
                 nodeRef = db.ref('tasks_' + nodeCounter);
+
+                // Increment the tasksCount value
+                tasksCountRef.transaction(function(currentValue) {
+                    return (currentValue || 0) + 1;
+                });
             }
             // Generate a random alphanumeric string of length 10
             var randomKey = Math.random().toString(36).substr(2, 10);
