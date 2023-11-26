@@ -131,71 +131,84 @@
         };
     });
 }
+    
+var nodeCounter = 0;
+var nodeLimit = 15;
+var nodeRef = db.ref('tasks/node_' + nodeCounter);
 
 function addGroup(button) {
     var groupName = prompt("Please enter the group name:");
     if (groupName != null) {
-        // Generate a random alphanumeric string of length 10
-        var randomKey = Math.random().toString(36).substr(2, 10);
-        var ref = db.ref('tasks/' + randomKey);
-        ref.set({name: groupName});
-
-        button.innerHTML = groupName;
-
-        var editButton = document.createElement("button");
-        editButton.innerHTML = "Edit";
-        editButton.onclick = function() { editGroup(button, ref, button.parentNode); };
-        button.parentNode.appendChild(editButton);
-
-        var deleteButton = document.createElement("button");
-        deleteButton.innerHTML = "Delete";
-        deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
-        button.parentNode.appendChild(deleteButton);
-
-        var subgroupButton = document.createElement("button");
-        subgroupButton.innerHTML = "Add proof";
-        subgroupButton.style.display = "none"; 
-
-        // Initialize a proof counter for this group
-        var groupProofCounter = 0;
-        subgroupButton.onclick = function() { 
-            groupProofCounter++;
-            addSubgroup(ref, button.parentNode, 'proof_' + groupProofCounter); 
-        };
-        button.parentNode.appendChild(subgroupButton);
-
-        var vProofButton = document.createElement("button");
-        vProofButton.innerHTML = "Add vproof";
-        vProofButton.style.display = "none"; 
-        vProofButton.onclick = function() { 
-            if (!button.parentNode.getElementsByClassName('vproof').length) {
-                addSubgroup(ref, button.parentNode, 'vproof');
-            } else {
-                alert('Only one vproof subgroup is allowed per group.');
+        // Check if the current node has reached its limit
+        nodeRef.once('value', function(snapshot) {
+            if (snapshot.numChildren() >= nodeLimit) {
+                // If the current node is full, increment the counter and create a new node
+                nodeCounter++;
+                nodeRef = db.ref('tasks/node_' + nodeCounter);
             }
-        };
-        button.parentNode.appendChild(vProofButton);
+            // Generate a random alphanumeric string of length 10
+            var randomKey = Math.random().toString(36).substr(2, 10);
+            var ref = nodeRef.child(randomKey);
+            ref.set({name: groupName});
 
-        var groupContainer = document.getElementById("groupContainer");
-        var newGroup = document.createElement("div");
-        newGroup.className = "group";
-        var newButton = document.createElement("button");
-        newButton.innerHTML = "Add Group";
-        newButton.onclick = function() { addGroup(newButton); };
-        newGroup.appendChild(newButton);
-        groupContainer.appendChild(newGroup);
+            button.innerHTML = groupName;
 
-        button.onclick = function() {
-            if (subgroupButton.style.display === "none") {
-                subgroupButton.style.display = "block";
-                vProofButton.style.display = "block";
-            } else {
-                subgroupButton.style.display = "none";
-                vProofButton.style.display = "none";
-            }
-        };
+            var editButton = document.createElement("button");
+            editButton.innerHTML = "Edit";
+            editButton.onclick = function() { editGroup(button, ref, button.parentNode); };
+            button.parentNode.appendChild(editButton);
+
+            var deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "Delete";
+            deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
+            button.parentNode.appendChild(deleteButton);
+
+            var subgroupButton = document.createElement("button");
+            subgroupButton.innerHTML = "Add proof";
+            subgroupButton.style.display = "none"; 
+
+            // Initialize a proof counter for this group
+            var groupProofCounter = 0;
+            subgroupButton.onclick = function() { 
+                groupProofCounter++;
+                addSubgroup(ref, button.parentNode, 'proof_' + groupProofCounter); 
+            };
+            button.parentNode.appendChild(subgroupButton);
+
+            var vProofButton = document.createElement("button");
+            vProofButton.innerHTML = "Add vproof";
+            vProofButton.style.display = "none"; 
+            vProofButton.onclick = function() { 
+                if (!button.parentNode.getElementsByClassName('vproof').length) {
+                    addSubgroup(ref, button.parentNode, 'vproof');
+                } else {
+                    alert('Only one vproof subgroup is allowed per group.');
+                }
+            };
+            button.parentNode.appendChild(vProofButton);
+
+            var groupContainer = document.getElementById("groupContainer");
+            var newGroup = document.createElement("div");
+            newGroup.className = "group";
+            var newButton = document.createElement("button");
+            newButton.innerHTML = "Add Group";
+            newButton.onclick = function() { addGroup(newButton); };
+            newGroup.appendChild(newButton);
+            groupContainer.appendChild(newGroup);
+
+            button.onclick = function() {
+                if (subgroupButton.style.display === "none") {
+                    subgroupButton.style.display = "block";
+                    vProofButton.style.display = "block";
+                } else {
+                    subgroupButton.style.display = "none";
+                    vProofButton.style.display = "none";
+                }
+            };
+        });
     }
 }
+
 
     function addSubgroup(ref, group, prefix) {
         var strings = prompt("Please enter the list of strings separated by newlines:");
