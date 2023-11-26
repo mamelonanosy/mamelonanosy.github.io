@@ -62,31 +62,31 @@
                     dummy.select();
                     document.execCommand("copy");
                     document.body.removeChild(dummy);
+                    showCheckmark(this.nextSibling);
                 };
+                var checkmark = document.createElement('span');
+                checkmark.className = 'checkmark';
+                checkmark.textContent = '✅';
                 lastInput.appendChild(line);
                 lastInput.appendChild(copyButton);
+                lastInput.appendChild(checkmark);
             }
         });
 
         function inputStrings() {
             var text = prompt("Enter the strings separated by newlines");
             ref.set(text).then(function() {
-                showCheckmark();
+                showCheckmark(document.getElementById("checkmark"));
             });
         }
 
-        function showCheckmark() {
-            var inputButton = document.getElementById("inputButton");
-            var checkmark = document.getElementById("checkmark");
-
+        function showCheckmark(checkmark) {
             // Hide the input button and show the checkmark
-            inputButton.style.display = "none";
             checkmark.style.display = "inline";
 
             setTimeout(function(){ 
-                // Hide the checkmark and show the input button after 2 seconds
+                // Hide the checkmark after 2 seconds
                 checkmark.style.display = "none"; 
-                inputButton.style.display = "inline";
             }, 2000);
         }
     </script>
