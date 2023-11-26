@@ -41,19 +41,35 @@
         <span class="checkmark" id="checkmark">✅</span>
     </div>
     <div id="lastInput"></div>
-    <button onclick="copyLastString()" id="copyButton">Copy Last String</button>
 
     <script>
         var db = firebase.database();
         var ref = db.ref('sync'); // Changed from 'text' to 'sync'
         ref.on('value', function(snapshot) {
             var text = snapshot.val();
-            document.getElementById("lastInput").innerHTML = text;
+            var lines = text.split('\n');
+            var lastInput = document.getElementById("lastInput");
+            lastInput.innerHTML = '';
+            for (var i = 0; i < lines.length; i++) {
+                var line = document.createElement('div');
+                line.textContent = lines[i];
+                var copyButton = document.createElement('button');
+                copyButton.textContent = 'Copy';
+                copyButton.onclick = function() {
+                    var dummy = document.createElement("textarea");
+                    document.body.appendChild(dummy);
+                    dummy.value = this.previousSibling.textContent;
+                    dummy.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(dummy);
+                };
+                lastInput.appendChild(line);
+                lastInput.appendChild(copyButton);
+            }
         });
 
         function inputStrings() {
             var text = prompt("Enter the strings separated by newlines");
-            text = text.replace(/(?<=%).*?(?=[0-9])/gs, ',');
             ref.set(text).then(function() {
                 showCheckmark();
             });
@@ -72,16 +88,6 @@
                 checkmark.style.display = "none"; 
                 inputButton.style.display = "inline";
             }, 2000);
-        }
-
-        function copyLastString() {
-            var lastInput = document.getElementById("lastInput").innerHTML;
-            var dummy = document.createElement("textarea");
-            document.body.appendChild(dummy);
-            dummy.value = lastInput;
-            dummy.select();
-            document.execCommand("copy");
-            document.body.removeChild(dummy);
         }
     </script>
 </body>
