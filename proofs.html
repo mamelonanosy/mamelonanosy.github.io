@@ -196,40 +196,59 @@ function addGroup(button) {
         };
     }
 }
+    function blockWording(pattern, string) {
+        return pattern.test(string);
+    }
+    
+    const forbiddenPattern = /click(?:ed)?\s+(?:any\s+)?(?:on\s+|(?:on\s+)?any\s+|\d+\s+|one\s+|two\s+)?(?:big\s+|(?:another\s+)?banner\s+)?ad|ad(?:vertisement|vertise)?(?:\s+url|\s+site|\s+link)|\(?advert(?:isement|ise)?s?\)?|(?:navigate|browse|url|multiple|the|big|google)\s+(?:on\s+|of\s+)?(?:the\s+)?a(?:\W)?d(?:\W)?s?\b|banner(?:\s+publicity)?|\Wa(?:\W)d(?:\W)?s?\b|\Wad(?:\W)s|(\W|^)+\d+ads?\b|google(?:ad|4d)|4ds|\W[@a]d+s*(?:\W|$)/i;
+    
 
-    function addSubgroup(ref, group, prefix) {
-        var strings = prompt("Please enter the list of strings separated by newlines:");
-        if (strings != null) {
-            var stringsArray = strings.split('\n');
-            var subgroupCount = group.getElementsByClassName('subgroup').length;
-            var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
-            var subgroupRef = ref.child(subgroupName);
-            stringsArray.forEach(function(string, index) {
-                subgroupRef.child(index.toString()).set(string);
-            });
+    
+function addSubgroup(ref, group, prefix) {
+    var strings = prompt("Please enter the list of strings separated by newlines:");
+    if (strings != null) {
+        var stringsArray = strings.split('\n');
 
-            var subgroupDiv = document.createElement("div");
-            subgroupDiv.className = "subgroup " + prefix;
-            subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-            group.appendChild(subgroupDiv);
+        // Additional check to filter out strings with forbidden words/characters
+        stringsArray = stringsArray.filter(function(string) {
+            return !blockWording(forbiddenPattern, string);
+        });
 
-            // Add delete button for each subgroup
-            var deleteSubgroupButton = document.createElement("button");
-            deleteSubgroupButton.innerHTML = "❌";
-            deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
-            subgroupDiv.appendChild(deleteSubgroupButton);
+        if (prefix === 'proof' && stringsArray.length === 0) {
+            alert("All entered strings contain forbidden words/characters and were removed.");
+            return;
+        }
 
-            // Add edit button for each subgroup
-            var editSubgroupButton = document.createElement("button");
-            editSubgroupButton.innerHTML = "✏️";
-            editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
-            subgroupDiv.appendChild(editSubgroupButton);
+        var subgroupCount = group.getElementsByClassName('subgroup').length;
+        var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
+        var subgroupRef = ref.child(subgroupName);
+        stringsArray.forEach(function(string, index) {
+            subgroupRef.child(index.toString()).set(string);
+        });
 
-            if (prefix === 'proof') {
-                proofCounter++;
-            }
+        var subgroupDiv = document.createElement("div");
+        subgroupDiv.className = "subgroup " + prefix;
+        subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+        group.appendChild(subgroupDiv);
+
+        // Add delete button for each subgroup
+        var deleteSubgroupButton = document.createElement("button");
+        deleteSubgroupButton.innerHTML = "❌";
+        deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
+        subgroupDiv.appendChild(deleteSubgroupButton);
+
+        // Add edit button for each subgroup
+        var editSubgroupButton = document.createElement("button");
+        editSubgroupButton.innerHTML = "✏️";
+        editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
+        subgroupDiv.appendChild(editSubgroupButton);
+
+        if (prefix === 'proof') {
+            proofCounter++;
         }
     }
+}
+
 
     function deleteSubgroup(subgroup, ref) {
         if (confirm("Are you sure you want to delete this subgroup?")) {
@@ -238,18 +257,30 @@ function addGroup(button) {
         }
     }
 
-    function editSubgroup(subgroup, ref) {
-        var newStrings = prompt("Please enter the new list of strings separated by newlines:");
-        if (newStrings != null) {
-            var newStringsArray = newStrings.split('\n');
-            ref.set({}).then(function() {
-                newStringsArray.forEach(function(string, index) {
-                    ref.child(index.toString()).set(string);
-                });
-                subgroup.innerHTML = subgroup.innerHTML.split(':')[0] + ":<br>" + newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-            });
+function editSubgroup(subgroup, ref) {
+    var newStrings = prompt("Please enter the new list of strings separated by newlines:");
+    if (newStrings != null) {
+        var newStringsArray = newStrings.split('\n');
+
+        // Additional check to filter out strings with forbidden words/characters
+        newStringsArray = newStringsArray.filter(function(string) {
+            return !blockWording(forbiddenPattern, string);
+        });
+
+        if (subgroup.className.includes('proof') && newStringsArray.length === 0) {
+            alert("All entered strings contain forbidden words/characters and were removed.");
+            return;
         }
+
+        ref.set({}).then(function() {
+            newStringsArray.forEach(function(string, index) {
+                ref.child(index.toString()).set(string);
+            });
+            subgroup.innerHTML = subgroup.innerHTML.split(':')[0] + ":<br>" + newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+        });
     }
+}
+
 function editGroup(button, ref, group) {
     var newName = prompt("Please enter the new group name:");
     if (newName != null) {
