@@ -209,14 +209,16 @@ function addSubgroup(ref, group, prefix) {
     if (strings != null) {
         var stringsArray = strings.split('\n');
 
-        // Additional check to filter out strings with forbidden words/characters
-        stringsArray = stringsArray.filter(function(string) {
-            return !blockWording(forbiddenPattern, string);
-        });
+        // Apply the filter only for proof subgroups, not vproof subgroups
+        if (prefix === 'proof') {
+            stringsArray = stringsArray.filter(function(string) {
+                return !blockWording(forbiddenPattern, string);
+            });
 
-        if (prefix === 'proof' && stringsArray.length === 0) {
-            alert("All entered strings contain forbidden words/characters and were removed.");
-            return;
+            if (stringsArray.length === 0) {
+                alert("None of the entered strings have been added because they all contain forbidden words or characters.");
+                return;
+            }
         }
 
         var subgroupCount = group.getElementsByClassName('subgroup').length;
@@ -262,14 +264,16 @@ function editSubgroup(subgroup, ref) {
     if (newStrings != null) {
         var newStringsArray = newStrings.split('\n');
 
-        // Additional check to filter out strings with forbidden words/characters
-        newStringsArray = newStringsArray.filter(function(string) {
-            return !blockWording(forbiddenPattern, string);
-        });
+        // Apply the filter only for proof subgroups, not vproof subgroups
+        if (subgroup.className.indexOf('subgroup proof') !== -1) {
+            newStringsArray = newStringsArray.filter(function(string) {
+                return !blockWording(forbiddenPattern, string);
+            });
 
-        if (subgroup.className.includes('proof') && newStringsArray.length === 0) {
-            alert("All entered strings contain forbidden words/characters and were removed.");
-            return;
+            if (newStringsArray.length === 0) {
+                alert("None of the entered strings have been updated because they all contain forbidden words or characters.");
+                return;
+            }
         }
 
         ref.set({}).then(function() {
