@@ -254,6 +254,34 @@
         var links = document.getElementsByClassName('links').length;
         document.getElementById('stats').innerHTML = "Total Groups: " + groups;
     }
+        function updateExistingGroups() {
+        var ref = db.ref('br');
+        ref.once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                var groupName = childSnapshot.key;
+                var groupRef = db.ref('br/' + groupName);
+                groupRef.once('value', function(groupSnapshot) {
+                    var stringsArray = [];
+                    groupSnapshot.forEach(function(linkSnapshot) {
+                        stringsArray.push(linkSnapshot.val());
+                    });
+                    stringsArray = stringsArray.filter(function(string) {
+                        return !forbiddenPattern.test(string.toLowerCase());
+                    });
+                    groupRef.set({});  // Clear the old data
+                    stringsArray.forEach(function(string, index) {
+                        groupRef.child(index.toString()).set(string);
+                    });
+                });
+            });
+        });
+    }
+
+    // Add the new button
+    var updateButton = document.createElement("button");
+    updateButton.innerHTML = "Update Groups";
+    updateButton.onclick = function() { updateExistingGroups(); };
+    document.getElementById("groupContainer").appendChild(updateButton);
 </script>
 
 <button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
