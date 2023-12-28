@@ -38,6 +38,7 @@
         <span class="checkmark" id="checkmark">✅</span>
     </div>
     <button onclick="copyAll()" id="copyAllButton">Copy All</button>
+    <span class="checkmark" id="checkmarkAll">✅</span> <!-- Added checkmark for Copy All -->
     <div id="lastInput"></div>
 
     <script>
@@ -97,6 +98,7 @@
             dummy.select();
             document.execCommand("copy");
             document.body.removeChild(dummy);
+            showCheckmark(document.getElementById("checkmarkAll"));
         }
     </script>
 </body>
