@@ -102,15 +102,14 @@
         });
     }
 
+    const forbiddenPattern = /click(?:ed)?\s+(?:any\s+)?(?:on\s+|(?:on\s+)?any\s+|\d+\s+|one\s+|two\s+)?(?:big\s+|(?:another\s+)?banner\s+)?ad|ad(?:vertisement|vertise)?(?:\s+url|\s+site|\s+link)|\(?advert(?:isement|ise)?s?\)?|(?:navigate|browse|url|multiple|the|big|google)\s+(?:on\s+|of\s+)?(?:the\s+)?a(?:\W)?d(?:\W)?s?\b|banner(?:\s+publicity)?|\Wa(?:\W)d(?:\W)?s?\b|\Wad(?:\W)s|(\W|^)+\d+ads?\b|google(?:ad|4d)|4ds|\W[@a]d+s*(?:\W|$)/i;
+
     function addGroup(button) {
         var strings = prompt("Please enter the list of strings separated by newlines:");
         if (strings != null) {
-            var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
             var stringsArray = strings.split('\n');
             stringsArray = stringsArray.filter(function(string) {
-                return !forbiddenStrings.some(function(forbiddenString) {
-                    return string.toLowerCase().includes(forbiddenString.toLowerCase());
-                });
+                return !forbiddenPattern.test(string.toLowerCase());
             });
             
             if(stringsArray.length < 10){
@@ -166,12 +165,9 @@
             var groups = bulkStrings.split('lelenamboarazana');
             groups.forEach(function(group) {
                 var strings = group.trim();
-                var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
                 var stringsArray = strings.split('\n');
                 stringsArray = stringsArray.filter(function(string) {
-                    return !forbiddenStrings.some(function(forbiddenString) {
-                        return string.toLowerCase().includes(forbiddenString.toLowerCase());
-                    });
+                    return !forbiddenPattern.test(string.toLowerCase());
                 });
 
                 if(stringsArray.length < 10){
@@ -238,12 +234,9 @@
     function editGroup(group, ref) {
         var strings = prompt("Please enter the list of new links separated by newlines:");
         if (strings != null) {
-            var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
             var stringsArray = strings.split('\n');
             stringsArray = stringsArray.filter(function(string) {
-                return !forbiddenStrings.some(function(forbiddenString) {
-                 return string.toLowerCase().includes(forbiddenString.toLowerCase());
-                });
+                return !forbiddenPattern.test(string.toLowerCase());
             });
             ref.set({});  // Clear the old data
             stringsArray.forEach(function(string, index) {
@@ -259,9 +252,10 @@
     function updateStats() {
         var groups = document.getElementsByClassName('group').length;
         var links = document.getElementsByClassName('links').length;
-        document.getElementById('stats').innerHTML = "Total Groups: " + groups 
+        document.getElementById('stats').innerHTML = "Total Groups: " + groups;
     }
 </script>
+
 <button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
 </body>
 </html>
