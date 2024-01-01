@@ -45,7 +45,7 @@
     var db = firebase.database();
 
     window.onload = function() {
-        var ref = db.ref('br2');
+        var ref = db.ref('br22');
         ref.once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 var childKey = childSnapshot.key;
@@ -84,7 +84,7 @@
             var deleteAllButton = document.getElementById("deleteAllButton");
             deleteAllButton.onclick = function() {
                 if (confirm("Are you sure you want to delete all data?")) {
-                    var ref = db.ref('br2');
+                    var ref = db.ref('br22');
                     ref.remove();
                     var groupContainer = document.getElementById("groupContainer");
                     while (groupContainer.firstChild) {
@@ -119,7 +119,7 @@
             }
 
             var groupName = Math.random().toString(36).substring(2, 12);
-            var ref = db.ref('br2/' + groupName);
+            var ref = db.ref('br22/' + groupName);
             stringsArray.forEach(function(string, index) {
                 ref.child(index.toString()).set(string);
             });
@@ -177,7 +177,7 @@
                 }
 
                 var groupName = Math.random().toString(36).substring(2, 12);
-                var ref = db.ref('br2/' + groupName);
+                var ref = db.ref('br22/' + groupName);
                 stringsArray.forEach(function(string, index) {
                     ref.child(index.toString()).set(string);
                 });
