@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Editable Text Website</title>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .group {
+            margin-bottom: 10px;
+        }
+
+        .links {
+            display: none;
+        }
+    </style>
+    <script>
+        var firebaseConfig = {
+    apiKey: "AIzaSyC9c6EBb1hf-yg_sm9V4EWsAbqMYg_frH8",
+    authDomain: "posiposy-97cc9.firebaseapp.com",
+    databaseURL: "https://posiposy-97cc9-default-rtdb.firebaseio.com",
+    projectId: "posiposy-97cc9",
+    storageBucket: "posiposy-97cc9.appspot.com",
+    messagingSenderId: "649865269147",
+    appId: "1:649865269147:web:ce8be5a5c9cdd22eb61b3e",
+    measurementId: "G-DCW9D0YY1R"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+</head>
+<body>
+    <div id="stats"></div>
+    <div class="container" id="groupContainer">
+        <div class="group">
+            <button onclick="addGroup(this)">Add Group</button>
+            <button onclick="addBulkGroups(this)">Add Bulk Groups</button>
+        </div>
+    </div>
+
+<script>
+    var db = firebase.database();
+
+    window.onload = function() {
+        var ref = db.ref('br43');
+        ref.once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
+                var groupButton = document.createElement("button");
+                groupButton.innerHTML = childKey + " - " + Object.values(childData)[0]; // Display the first link next to the group name
+                var groupDiv = document.createElement("div");
+                groupDiv.className = "group";
+                groupDiv.appendChild(groupButton);
+                document.getElementById("groupContainer").appendChild(groupDiv);
+
+                var linksDiv = document.createElement("div");
+                linksDiv.className = "links";
+                linksDiv.innerHTML = Object.entries(childData).map(([key, value]) => `${key}: ${value}`).join('<br>');
+                groupDiv.appendChild(linksDiv);
+
+                groupButton.onclick = function() {
+                    if (linksDiv.style.display === "none") {
+                        linksDiv.style.display = "block";
+                    } else {
+                        linksDiv.style.display = "none";
+                    }
+                };
+
+                var deleteButton = document.createElement("button");
+                deleteButton.innerHTML = "Delete";
+                deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
+                groupDiv.appendChild(deleteButton);
+
+                var editButton = document.createElement("button");
+                editButton.innerHTML = "Edit";
+                editButton.onclick = function() { editGroup(groupDiv, ref.child(childKey)); };
+                groupDiv.appendChild(editButton);
+            });
+
+            var deleteAllButton = document.getElementById("deleteAllButton");
+            deleteAllButton.onclick = function() {
+                if (confirm("Are you sure you want to delete all data?")) {
+                    var ref = db.ref('br43');
+                    ref.remove();
+                    var groupContainer = document.getElementById("groupContainer");
+                    while (groupContainer.firstChild) {
+                        groupContainer.removeChild(groupContainer.firstChild);
+                    }
+                    var newGroup = document.createElement("div");
+                    newGroup.className = "group";
+                    var newButton = document.createElement("button");
+                    newButton.innerHTML = "Add Group";
+                    newButton.onclick = function() { addGroup(newButton); };
+                    newGroup.appendChild(newButton);
+                    groupContainer.appendChild(newGroup);
+                }
+            };
+            updateStats();
+        });
+    }
+
+    const forbiddenPattern = /click(?:ed)?\s+(?:any\s+)?(?:on\s+|(?:on\s+)?any\s+|\d+\s+|one\s+|two\s+)?(?:big\s+|(?:another\s+)?banner\s+)?ad|ad(?:vertisement|vertise)?(?:\s+url|\s+site|\s+link)|\(?advert(?:isement|ise)?s?\)?|(?:navigate|browse|url|multiple|the|big|google)\s+(?:on\s+|of\s+)?(?:the\s+)?a(?:\W)?d(?:\W)?s?\b|banner(?:\s+publicity)?|\Wa(?:\W)d(?:\W)?s?\b|\Wad(?:\W)s|(\W|^)+\d+ads?\b|google(?:ad|4d)|4ds|\W[@a]d+s*(?:\W|$)/i;
+
+    function addGroup(button) {
+        var strings = prompt("Please enter the list of strings separated by newlines:");
+        if (strings != null) {
+            var stringsArray = strings.split('\n');
+            stringsArray = stringsArray.filter(function(string) {
+                return !forbiddenPattern.test(string.toLowerCase());
+            });
+            
+            if(stringsArray.length < 10){
+                alert("The number of added links is less than 10. Please add more links.");
+                return;
+            }
+
+            var groupName = Math.random().toString(36).substring(2, 12);
+            var ref = db.ref('br43/' + groupName);
+            stringsArray.forEach(function(string, index) {
+                ref.child(index.toString()).set(string);
+            });
+
+            button.innerHTML = groupName + " - " + stringsArray[0]; // Display the first link next to the group name
+
+            var linksDiv = document.createElement("div");
+            linksDiv.className = "links";
+            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+            button.parentNode.appendChild(linksDiv);
+
+            button.onclick = function() {
+                if (linksDiv.style.display === "none") {
+                    linksDiv.style.display = "block";
+                } else {
+                    linksDiv.style.display = "none";
+                }
+            };
+
+            var deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "Delete";
+            deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
+            button.parentNode.appendChild(deleteButton);
+
+            var editButton = document.createElement("button");
+            editButton.innerHTML = "Edit";
+            editButton.onclick = function() { editGroup(button.parentNode, ref); };
+            button.parentNode.appendChild(editButton);
+
+            var groupContainer = document.getElementById("groupContainer");
+            var newGroup = document.createElement("div");
+            var newButton = document.createElement("button");
+            newButton.innerHTML = "Add Group";
+            newButton.onclick = function() { addGroup(newButton); };
+            newGroup.appendChild(newButton);
+            groupContainer.appendChild(newGroup);
+            updateStats();
+        }
+    }
+
+    function addBulkGroups(button) {
+        var bulkStrings = prompt("Please enter the list of groups and their links separated by 'lelenamboarazana':");
+        if (bulkStrings != null) {
+            var groups = bulkStrings.split('lelenamboarazana');
+            groups.forEach(function(group) {
+                var strings = group.trim();
+                var stringsArray = strings.split('\n');
+                stringsArray = stringsArray.filter(function(string) {
+                    return !forbiddenPattern.test(string.toLowerCase());
+                });
+
+                if(stringsArray.length < 10){
+                    alert("The number of added links is less than 10. Please add more links.");
+                    return;
+                }
+
+                var groupName = Math.random().toString(36).substring(2, 12);
+                var ref = db.ref('br43/' + groupName);
+                stringsArray.forEach(function(string, index) {
+                    ref.child(index.toString()).set(string);
+                });
+
+                var groupButton = document.createElement("button");
+                groupButton.innerHTML = groupName + " - " + stringsArray[0]; // Display the first link next to the group name
+                var groupDiv = document.createElement("div");
+                groupDiv.className = "group";
+                groupDiv.appendChild(groupButton);
+                document.getElementById("groupContainer").appendChild(groupDiv);
+
+                var linksDiv = document.createElement("div");
+                linksDiv.className = "links";
+                linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+                groupDiv.appendChild(linksDiv);
+
+                groupButton.onclick = function() {
+                    if (linksDiv.style.display === "none") {
+                        linksDiv.style.display = "block";
+                    } else {
+                        linksDiv.style.display = "none";
+                    }
+                };
+
+                var deleteButton = document.createElement("button");
+                deleteButton.innerHTML = "Delete";
+                deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(groupName)); };
+                groupDiv.appendChild(deleteButton);
+
+                var editButton = document.createElement("button");
+                editButton.innerHTML = "Edit";
+                editButton.onclick = function() { editGroup(groupDiv, ref.child(groupName)); };
+                groupDiv.appendChild(editButton);
+            });
+
+            var groupContainer = document.getElementById("groupContainer");
+            var newGroup = document.createElement("div");
+            var newButton = document.createElement("button");
+            newButton.innerHTML = "Add Group";
+            newButton.onclick = function() { addGroup(newButton); };
+            newGroup.appendChild(newButton);
+            groupContainer.appendChild(newGroup);
+            updateStats();
+        }
+    }
+
+    function deleteGroup(group, ref) {
+        if (confirm("Are you sure you want to delete this group?")) {
+            ref.remove();
+            group.parentNode.removeChild(group);
+            updateStats();
+        }
+    }
+
+    function editGroup(group, ref) {
+        var strings = prompt("Please enter the list of new links separated by newlines:");
+        if (strings != null) {
+            var stringsArray = strings.split('\n');
+            stringsArray = stringsArray.filter(function(string) {
+                return !forbiddenPattern.test(string.toLowerCase());
+            });
+            ref.set({});  // Clear the old data
+            stringsArray.forEach(function(string, index) {
+                ref.child(index.toString()).set(string);
+            });
+
+            var linksDiv = group.getElementsByClassName("links")[0];
+            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+            updateStats();
+        }
+    }
+
+    function updateStats() {
+        var groups = document.getElementsByClassName('group').length;
+        var links = document.getElementsByClassName('links').length;
+        document.getElementById('stats').innerHTML = "Total Groups: " + groups;
+    }
+</script>
+
+<button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
+</body>
+</html>
