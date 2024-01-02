@@ -45,7 +45,7 @@
     var db = firebase.database();
 
     window.onload = function() {
-        var ref = db.ref(');
+        var ref = db.ref('br16');
         ref.once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 var childKey = childSnapshot.key;
@@ -84,7 +84,7 @@
             var deleteAllButton = document.getElementById("deleteAllButton");
             deleteAllButton.onclick = function() {
                 if (confirm("Are you sure you want to delete all data?")) {
-                    var ref = db.ref(');
+                    var ref = db.ref('br16');
                     ref.remove();
                     var groupContainer = document.getElementById("groupContainer");
                     while (groupContainer.firstChild) {
