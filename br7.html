@@ -20,13 +20,14 @@
     </style>
     <script>
         var firebaseConfig = {
-            apiKey: "AIzaSyBKtqcRTqmwOn758IA3nOGIRzV7Qk_kG2Q",
-            authDomain: "automation-f208d.firebaseapp.com",
-            databaseURL: "https://automation-f208d-default-rtdb.firebaseio.com",
-            projectId: "automation-f208d",
-            storageBucket: "automation-f208d.appspot.com",
-            messagingSenderId: "861003739122",
-            appId: "1:861003739122:web:0866a42e4bbcc36d54056b"
+    apiKey: "AIzaSyC9c6EBb1hf-yg_sm9V4EWsAbqMYg_frH8",
+    authDomain: "posiposy-97cc9.firebaseapp.com",
+    databaseURL: "https://posiposy-97cc9-default-rtdb.firebaseio.com",
+    projectId: "posiposy-97cc9",
+    storageBucket: "posiposy-97cc9.appspot.com",
+    messagingSenderId: "649865269147",
+    appId: "1:649865269147:web:ce8be5a5c9cdd22eb61b3e",
+    measurementId: "G-DCW9D0YY1R"
         };
         firebase.initializeApp(firebaseConfig);
     </script>
@@ -58,7 +59,7 @@
 
                 var linksDiv = document.createElement("div");
                 linksDiv.className = "links";
-                linksDiv.innerHTML = Object.entries(childData).map(([key, value]) => `${key}: ${value}`).join('<br7>');
+                linksDiv.innerHTML = Object.entries(childData).map(([key, value]) => `${key}: ${value}`).join('<br>');
                 groupDiv.appendChild(linksDiv);
 
                 groupButton.onclick = function() {
@@ -102,15 +103,14 @@
         });
     }
 
+    const forbiddenPattern = /click(?:ed)?\s+(?:any\s+)?(?:on\s+|(?:on\s+)?any\s+|\d+\s+|one\s+|two\s+)?(?:big\s+|(?:another\s+)?banner\s+)?ad|ad(?:vertisement|vertise)?(?:\s+url|\s+site|\s+link)|\(?advert(?:isement|ise)?s?\)?|(?:navigate|browse|url|multiple|the|big|google)\s+(?:on\s+|of\s+)?(?:the\s+)?a(?:\W)?d(?:\W)?s?\b|banner(?:\s+publicity)?|\Wa(?:\W)d(?:\W)?s?\b|\Wad(?:\W)s|(\W|^)+\d+ads?\b|google(?:ad|4d)|4ds|\W[@a]d+s*(?:\W|$)/i;
+
     function addGroup(button) {
         var strings = prompt("Please enter the list of strings separated by newlines:");
         if (strings != null) {
-            var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
             var stringsArray = strings.split('\n');
             stringsArray = stringsArray.filter(function(string) {
-                return !forbiddenStrings.some(function(forbiddenString) {
-                    return string.toLowerCase().includes(forbiddenString.toLowerCase());
-                });
+                return !forbiddenPattern.test(string.toLowerCase());
             });
             
             if(stringsArray.length < 10){
@@ -128,7 +128,7 @@
 
             var linksDiv = document.createElement("div");
             linksDiv.className = "links";
-            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br7>');
+            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
             button.parentNode.appendChild(linksDiv);
 
             button.onclick = function() {
@@ -166,12 +166,9 @@
             var groups = bulkStrings.split('lelenamboarazana');
             groups.forEach(function(group) {
                 var strings = group.trim();
-                var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
                 var stringsArray = strings.split('\n');
                 stringsArray = stringsArray.filter(function(string) {
-                    return !forbiddenStrings.some(function(forbiddenString) {
-                        return string.toLowerCase().includes(forbiddenString.toLowerCase());
-                    });
+                    return !forbiddenPattern.test(string.toLowerCase());
                 });
 
                 if(stringsArray.length < 10){
@@ -194,7 +191,7 @@
 
                 var linksDiv = document.createElement("div");
                 linksDiv.className = "links";
-                linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br7>');
+                linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
                 groupDiv.appendChild(linksDiv);
 
                 groupButton.onclick = function() {
@@ -238,12 +235,9 @@
     function editGroup(group, ref) {
         var strings = prompt("Please enter the list of new links separated by newlines:");
         if (strings != null) {
-            var forbiddenStrings = ['ads', 'click', 'banner', 'banners', 'Banner', 'Click', '#','advertisement', 'advertisements', 'add'];
             var stringsArray = strings.split('\n');
             stringsArray = stringsArray.filter(function(string) {
-                return !forbiddenStrings.some(function(forbiddenString) {
-                 return string.toLowerCase().includes(forbiddenString.toLowerCase());
-                });
+                return !forbiddenPattern.test(string.toLowerCase());
             });
             ref.set({});  // Clear the old data
             stringsArray.forEach(function(string, index) {
@@ -251,7 +245,7 @@
             });
 
             var linksDiv = group.getElementsByClassName("links")[0];
-            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br7>');
+            linksDiv.innerHTML = stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
             updateStats();
         }
     }
@@ -259,9 +253,10 @@
     function updateStats() {
         var groups = document.getElementsByClassName('group').length;
         var links = document.getElementsByClassName('links').length;
-        document.getElementById('stats').innerHTML = "Total Groups: " + groups 
+        document.getElementById('stats').innerHTML = "Total Groups: " + groups;
     }
 </script>
+
 <button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
 </body>
 </html>
