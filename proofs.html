@@ -219,6 +219,12 @@ function addSubgroup(ref, group, prefix) {
     if (strings != null) {
         var stringsArray = strings.split('\n');
 
+        // Check the first string for the 'pw-' pattern
+        if (stringsArray.length > 0 && stringsArray[0].startsWith('pw-')) {
+            alert("The first string cannot start with 'pw-'.");
+            return;
+        }
+
         // Apply the filter only for proof subgroups, not vproof subgroups
         if (prefix === 'proof') {
             stringsArray = stringsArray.filter(function(string) {
