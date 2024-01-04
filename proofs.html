@@ -219,10 +219,23 @@ function addSubgroup(ref, group, prefix) {
     if (strings != null) {
         var stringsArray = strings.split('\n');
 
-        // Check the first string for the 'pw-' pattern
-        if (stringsArray.length > 0 && stringsArray[0].startsWith('pw-')) {
-            alert("The first string cannot start with 'pw-'.");
-            return;
+        // Check if the first string starts with 'pw-' and the next string is a link
+        if (stringsArray.length > 1 && stringsArray[0].startsWith('pw-')) {
+            var potentialLink = stringsArray[1];
+            var urlPattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+                '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+                '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+                '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+
+            if (!urlPattern.test(potentialLink)) {
+                alert("The second string must be a valid link.");
+                return;
+            } else {
+                var url = new URL(potentialLink);
+                alert("Domain and Hostname: " + url.origin);
+            }
         }
 
         // Apply the filter only for proof subgroups, not vproof subgroups
@@ -237,7 +250,6 @@ function addSubgroup(ref, group, prefix) {
             }
         }
 
-        var subgroupCount = group.getElementsByClassName('subgroup').length;
         var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
         var subgroupRef = ref.child(subgroupName);
         stringsArray.forEach(function(string, index) {
