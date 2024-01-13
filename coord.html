@@ -49,8 +49,6 @@
             groupDiv.className = "group";
             groupDiv.appendChild(groupButton);
             document.getElementById("groupContainer").appendChild(groupDiv);
-
-            groupDiv.appendChild(doneButton);
             childSnapshot.forEach(function(subgroupSnapshot) {
                 var subgroupKey = subgroupSnapshot.key;
                 var subgroupData = subgroupSnapshot.val();
