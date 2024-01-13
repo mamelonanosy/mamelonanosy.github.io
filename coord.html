@@ -83,7 +83,7 @@
             groupDiv.appendChild(deleteButton);
             // Inside the window.onload function, after creating the deleteButton for each group:
 var doneButton = document.createElement("button");
-doneButton.innerHTML = "Done";
+doneButton.innerHTML = "Done ✅";
 doneButton.onclick = function() { 
     markGroupAsDone(ref.child(childKey), groupButton, doneButton); 
 };
@@ -146,7 +146,7 @@ function addGroup(button) {
         ref.once('value', function(snapshot) {
             var isDuplicate = false;
             snapshot.forEach(function(childSnapshot) {
-                var existingGroupName = childSnapshot.val().name.replace(' done', '');
+                var existingGroupName = childSnapshot.val().name.replace(' ✅', '');
                 if (existingGroupName === groupName) {
                     isDuplicate = true;
                 }
@@ -175,7 +175,7 @@ function addGroup(button) {
                 groupDiv.appendChild(deleteButton);
 
                 var doneButton = document.createElement("button");
-                doneButton.innerHTML = "Done";
+                doneButton.innerHTML = "Done ✅";
                 doneButton.onclick = function() { markGroupAsDone(newRef, newGroupButton, doneButton); };
                 groupDiv.appendChild(doneButton);
                             // Initialize a proof counter for this group
@@ -228,7 +228,7 @@ function blockWording(pattern, string) {
 function markGroupAsDone(groupRef, button, doneButton) {
     groupRef.child('name').once('value', function(snapshot) {
         var groupName = snapshot.val();
-        var updatedGroupName = groupName + ' done'; // The name to be stored in the database
+        var updatedGroupName = groupName + ' ✅'; // The name to be stored in the database
         var displayGroupName = groupName + ' ✅'; // The name to be displayed on the page
 
         groupRef.child('name').set(updatedGroupName, function(error) {
