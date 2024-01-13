@@ -207,20 +207,22 @@ function addGroup(button) {
     
     const forbiddenPattern = /click(?:ed)?\s+(?:any\s+)?(?:on\s+|(?:on\s+)?any\s+|\d+\s+|one\s+|two\s+)?(?:big\s+|(?:another\s+)?banner\s+)?ad|ad(?:vertisement|vertise)?(?:\s+url|\s+site|\s+link)|\(?advert(?:isement|ise)?s?\)?|(?:navigate|browse|url|multiple|the|big|google)\s+(?:on\s+|of\s+)?(?:the\s+)?a(?:\W)?d(?:\W)?s?\b|banner(?:\s+publicity)?|\Wa(?:\W)d(?:\W)?s?\b|\Wad(?:\W)s|(\W|^)+\d+ads?\b|google(?:ad|4d)|4ds|\W[@a]d+s*(?:\W|$)/i;
     
-// Modify the markGroupAsDone function to accept the button element
+// Modify the markGroupAsDone function to show the icon
 function markGroupAsDone(groupRef, button, doneButton) {
     groupRef.child('name').once('value', function(snapshot) {
         var groupName = snapshot.val();
-        var updatedGroupName = groupName + ' done';
+        var updatedGroupName = groupName + ' done'; // The name to be stored in the database
+        var displayGroupName = groupName + ' ✅'; // The name to be displayed on the page
+
         groupRef.child('name').set(updatedGroupName, function(error) {
             if (!error) {
-                button.innerHTML = updatedGroupName;
-                doneButton.style.display = 'none'; // Hide the button
-                // or doneButton.remove(); // Remove the button from the DOM
+                button.innerHTML = displayGroupName; // Display the name with the icon on the page
+                doneButton.style.display = 'none'; // Hide the "Done" button
             }
         });
     });
 }
+
     
 function addSubgroup(ref, group, prefix) {
     var strings = prompt("Please enter the list of strings separated by newlines:");
