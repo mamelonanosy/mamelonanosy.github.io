@@ -49,13 +49,15 @@
             groupDiv.className = "group";
             groupDiv.appendChild(groupButton);
             document.getElementById("groupContainer").appendChild(groupDiv);
-            // Inside the window.onload function, after creating the deleteButton for each group:
-var doneButton = document.createElement("button");
-doneButton.innerHTML = "Done";
-doneButton.onclick = function() { 
-    markGroupAsDone(ref.child(childKey), groupButton, doneButton); 
-};
-groupDiv.appendChild(doneButton);
+                        if (!groupDiv.querySelector(".done-button")) {
+                var doneButton = document.createElement("button");
+                doneButton.innerHTML = "Done";
+                doneButton.className = "done-button";
+                doneButton.onclick = function() { 
+                    markGroupAsDone(ref.child(childKey), groupButton, doneButton); 
+                };
+                groupDiv.appendChild(doneButton);
+            }
             childSnapshot.forEach(function(subgroupSnapshot) {
                 var subgroupKey = subgroupSnapshot.key;
                 var subgroupData = subgroupSnapshot.val();
