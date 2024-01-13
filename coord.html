@@ -257,19 +257,22 @@ function     addSubgroup(ref, group, prefix) {
     }
 }
 
+// Modify the markGroupAsDone function to show the icon
 function markGroupAsDone(groupRef, button, doneButton) {
     groupRef.child('name').once('value', function(snapshot) {
         var groupName = snapshot.val();
-        var updatedGroupName = groupName + ' done';
+        var updatedGroupName = groupName + ' done'; // The name to be stored in the database
+        var displayGroupName = groupName + ' ✅'; // The name to be displayed on the page
+
         groupRef.child('name').set(updatedGroupName, function(error) {
             if (!error) {
-                button.innerHTML = updatedGroupName;
-                doneButton.style.display = 'none'; // Hide the button
-                // or doneButton.remove(); // Remove the button from the DOM
+                button.innerHTML = displayGroupName; // Display the name with the icon on the page
+                doneButton.style.display = 'none'; // Hide the "Done" button
             }
         });
     });
 }
+
     
     function deleteSubgroup(subgroup, ref) {
         if (confirm("Are you sure you want to delete this subgroup?")) {
