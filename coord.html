@@ -83,7 +83,7 @@
             groupDiv.appendChild(deleteButton);
             // Inside the window.onload function, after creating the deleteButton for each group:
 var doneButton = document.createElement("button");
-doneButton.innerHTML = "Done ✅";
+doneButton.innerHTML = "Done";
 doneButton.onclick = function() { 
     markGroupAsDone(ref.child(childKey), groupButton, doneButton); 
 };
@@ -175,7 +175,7 @@ function addGroup(button) {
                 groupDiv.appendChild(deleteButton);
 
                 var doneButton = document.createElement("button");
-                doneButton.innerHTML = "Done ✅";
+                doneButton.innerHTML = "Done";
                 doneButton.onclick = function() { markGroupAsDone(newRef, newGroupButton, doneButton); };
                 groupDiv.appendChild(doneButton);
                             // Initialize a proof counter for this group
