@@ -22,7 +22,7 @@
   projectId: "automation-f208d",
   storageBucket: "automation-f208d.appspot.com",
   messagingSenderId: "861003739122",
-  appId: "1:861003739122:web:0866a42e4bbcc36d54056b"  };
+  appId: "1:861003739122:web:0866a42e4bbcc36d54056b", };
         firebase.initializeApp(firebaseConfig);
     </script>
 </head>
@@ -49,15 +49,6 @@
             groupDiv.className = "group";
             groupDiv.appendChild(groupButton);
             document.getElementById("groupContainer").appendChild(groupDiv);
-                        if (!groupDiv.querySelector(".done-button")) {
-                var doneButton = document.createElement("button");
-                doneButton.innerHTML = "Done";
-                doneButton.className = "done-button";
-                doneButton.onclick = function() { 
-                    markGroupAsDone(ref.child(childKey), groupButton, doneButton); 
-                };
-                groupDiv.appendChild(doneButton);
-            }
             childSnapshot.forEach(function(subgroupSnapshot) {
                 var subgroupKey = subgroupSnapshot.key;
                 var subgroupData = subgroupSnapshot.val();
@@ -79,6 +70,7 @@
                 editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
                 subgroupDiv.appendChild(editSubgroupButton);
             });
+            
 
             var editButton = document.createElement("button");
             editButton.innerHTML = "Edit";
@@ -89,6 +81,13 @@
             deleteButton.innerHTML = "Delete";
             deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
             groupDiv.appendChild(deleteButton);
+            // Inside the window.onload function, after creating the deleteButton for each group:
+var doneButton = document.createElement("button");
+doneButton.innerHTML = "Done";
+doneButton.onclick = function() { 
+    markGroupAsDone(ref.child(childKey), groupButton, doneButton); 
+};
+groupDiv.appendChild(doneButton);
 
             var subgroupButton = document.createElement("button");
             subgroupButton.innerHTML = "Add proof";
@@ -160,6 +159,11 @@ function addGroup(button) {
         deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
         button.parentNode.appendChild(deleteButton);
 
+        var doneButton = document.createElement("button");
+        doneButton.innerHTML = "Done";
+        doneButton.onclick = function() { markGroupAsDone(ref, newGroupButton, doneButton); };
+        groupDiv.appendChild(doneButton);
+
         var subgroupButton = document.createElement("button");
         subgroupButton.innerHTML = "Add proof";
         subgroupButton.style.display = "none"; 
@@ -210,50 +214,6 @@ function addGroup(button) {
     
     const forbiddenPattern = /click(?:ed)?\s+(?:any\s+)?(?:on\s+|(?:on\s+)?any\s+|\d+\s+|one\s+|two\s+)?(?:big\s+|(?:another\s+)?banner\s+)?ad|ad(?:vertisement|vertise)?(?:\s+url|\s+site|\s+link)|\(?advert(?:isement|ise)?s?\)?|(?:navigate|browse|url|multiple|the|big|google)\s+(?:on\s+|of\s+)?(?:the\s+)?a(?:\W)?d(?:\W)?s?\b|banner(?:\s+publicity)?|\Wa(?:\W)d(?:\W)?s?\b|\Wad(?:\W)s|(\W|^)+\d+ads?\b|google(?:ad|4d)|4ds|\W[@a]d+s*(?:\W|$)/i;
     
-
-    
-function addGroup(button) {
-    var groupName = prompt("Please enter the group name:");
-    if (groupName != null) {
-        // Generate a random alphanumeric string of length 10
-        var randomKey = Math.random().toString(36).substr(2, 10);
-        var ref = db.ref('tasks/' + randomKey);
-        ref.set({name: groupName});
-
-        var groupDiv = document.createElement("div");
-        groupDiv.className = "group";
-
-        var groupButton = document.createElement("button");
-        groupButton.innerHTML = groupName;
-        groupDiv.appendChild(groupButton);
-
-        var editButton = document.createElement("button");
-        editButton.innerHTML = "Edit";
-        editButton.onclick = function() { editGroup(groupButton, ref, groupDiv); };
-        groupDiv.appendChild(editButton);
-
-        var deleteButton = document.createElement("button");
-        deleteButton.innerHTML = "Delete";
-        deleteButton.onclick = function() { deleteGroup(groupDiv, ref); };
-        groupDiv.appendChild(deleteButton);
-
-        var doneButton = document.createElement("button");
-        doneButton.innerHTML = "Done";
-        doneButton.onclick = function() { markGroupAsDone(ref, groupButton, doneButton); };
-        groupDiv.appendChild(doneButton);
-
-        document.getElementById("groupContainer").appendChild(groupDiv);
-
-        var newGroupDiv = document.createElement("div");
-        newGroupDiv.className = "group";
-        var newButton = document.createElement("button");
-        newButton.innerHTML = "Add Group";
-        newButton.onclick = function() { addGroup(newButton); };
-        newGroupDiv.appendChild(newButton);
-        document.getElementById("groupContainer").appendChild(newGroupDiv);
-    }
-}
-
 // Modify the markGroupAsDone function to show the icon
 function markGroupAsDone(groupRef, button, doneButton) {
     groupRef.child('name').once('value', function(snapshot) {
@@ -271,6 +231,54 @@ function markGroupAsDone(groupRef, button, doneButton) {
 }
 
     
+function addSubgroup(ref, group, prefix) {
+    var strings = prompt("Please enter the list of strings separated by newlines:");
+    if (strings != null) {
+        var stringsArray = strings.split('\n');
+
+        // Apply the filter only for proof subgroups, not vproof subgroups
+        if (prefix === 'proof') {
+            stringsArray = stringsArray.filter(function(string) {
+                return !blockWording(forbiddenPattern, string);
+            });
+
+            if (stringsArray.length === 0) {
+                alert("None of the entered strings have been added because they all contain forbidden words or characters.");
+                return;
+            }
+        }
+
+        var subgroupCount = group.getElementsByClassName('subgroup').length;
+        var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
+        var subgroupRef = ref.child(subgroupName);
+        stringsArray.forEach(function(string, index) {
+            subgroupRef.child(index.toString()).set(string);
+        });
+
+        var subgroupDiv = document.createElement("div");
+        subgroupDiv.className = "subgroup " + prefix;
+        subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+        group.appendChild(subgroupDiv);
+
+        // Add delete button for each subgroup
+        var deleteSubgroupButton = document.createElement("button");
+        deleteSubgroupButton.innerHTML = "❌";
+        deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
+        subgroupDiv.appendChild(deleteSubgroupButton);
+
+        // Add edit button for each subgroup
+        var editSubgroupButton = document.createElement("button");
+        editSubgroupButton.innerHTML = "✏️";
+        editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
+        subgroupDiv.appendChild(editSubgroupButton);
+
+        if (prefix === 'proof') {
+            proofCounter++;
+        }
+    }
+}
+
+
     function deleteSubgroup(subgroup, ref) {
         if (confirm("Are you sure you want to delete this subgroup?")) {
             ref.remove();
@@ -323,4 +331,4 @@ function editGroup(button, ref, group) {
 </script>
 <button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
 </body>
-</html> 
+</html>
