@@ -212,50 +212,45 @@ function addGroup(button) {
     
 
     
-function     addSubgroup(ref, group, prefix) {
-    var strings = prompt("Please enter the list of strings separated by newlines:");
-    if (strings != null) {
-        var stringsArray = strings.split('\n');
+function addGroup(button) {
+    var groupName = prompt("Please enter the group name:");
+    if (groupName != null) {
+        // Generate a random alphanumeric string of length 10
+        var randomKey = Math.random().toString(36).substr(2, 10);
+        var ref = db.ref('tasks/' + randomKey);
+        ref.set({name: groupName});
 
-        // Apply the filter only for proof subgroups, not vproof subgroups
-        if (prefix === 'proof') {
-            stringsArray = stringsArray.filter(function(string) {
-                return !blockWording(forbiddenPattern, string);
-            });
+        var groupDiv = document.createElement("div");
+        groupDiv.className = "group";
 
-            if (stringsArray.length === 0) {
-                alert("None of the entered strings have been added because they all contain forbidden words or characters.");
-                return;
-            }
-        }
+        var groupButton = document.createElement("button");
+        groupButton.innerHTML = groupName;
+        groupDiv.appendChild(groupButton);
 
-        var subgroupCount = group.getElementsByClassName('subgroup').length;
-        var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
-        var subgroupRef = ref.child(subgroupName);
-        stringsArray.forEach(function(string, index) {
-            subgroupRef.child(index.toString()).set(string);
-        });
+        var editButton = document.createElement("button");
+        editButton.innerHTML = "Edit";
+        editButton.onclick = function() { editGroup(groupButton, ref, groupDiv); };
+        groupDiv.appendChild(editButton);
 
-        var subgroupDiv = document.createElement("div");
-        subgroupDiv.className = "subgroup " + prefix;
-        subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-        group.appendChild(subgroupDiv);
+        var deleteButton = document.createElement("button");
+        deleteButton.innerHTML = "Delete";
+        deleteButton.onclick = function() { deleteGroup(groupDiv, ref); };
+        groupDiv.appendChild(deleteButton);
 
-        // Add delete button for each subgroup
-        var deleteSubgroupButton = document.createElement("button");
-        deleteSubgroupButton.innerHTML = "❌";
-        deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
-        subgroupDiv.appendChild(deleteSubgroupButton);
+        var doneButton = document.createElement("button");
+        doneButton.innerHTML = "Done";
+        doneButton.onclick = function() { markGroupAsDone(ref, groupButton, doneButton); };
+        groupDiv.appendChild(doneButton);
 
-        // Add edit button for each subgroup
-        var editSubgroupButton = document.createElement("button");
-        editSubgroupButton.innerHTML = "✏️";
-        editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
-        subgroupDiv.appendChild(editSubgroupButton);
+        document.getElementById("groupContainer").appendChild(groupDiv);
 
-        if (prefix === 'proof') {
-            proofCounter++;
-        }
+        var newGroupDiv = document.createElement("div");
+        newGroupDiv.className = "group";
+        var newButton = document.createElement("button");
+        newButton.innerHTML = "Add Group";
+        newButton.onclick = function() { addGroup(newButton); };
+        newGroupDiv.appendChild(newButton);
+        document.getElementById("groupContainer").appendChild(newGroupDiv);
     }
 }
 
