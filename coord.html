@@ -63,11 +63,6 @@
                 deleteSubgroupButton.innerHTML = "❌";
                 deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, ref.child(childKey).child(subgroupKey)); };
                 subgroupDiv.appendChild(deleteSubgroupButton);
-                var doneButton = document.createElement("button");
-doneButton.innerHTML = "Done";
-doneButton.onclick = function() { markGroupAsDone(ref.child(childKey), groupButton); };
-groupDiv.appendChild(doneButton);
-
                 // Add edit button for each subgroup
                 var editSubgroupButton = document.createElement("button");
                 editSubgroupButton.innerHTML = "✏️";
@@ -84,6 +79,10 @@ groupDiv.appendChild(doneButton);
             deleteButton.innerHTML = "Delete";
             deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
             groupDiv.appendChild(deleteButton);
+            var doneButton = document.createElement("button");
+            doneButton.innerHTML = "Done";
+            doneButton.onclick = function() { markGroupAsDone(ref.child(childKey), groupButton); };
+            groupDiv.appendChild(doneButton);
 
             var subgroupButton = document.createElement("button");
             subgroupButton.innerHTML = "Add proof";
