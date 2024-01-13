@@ -79,10 +79,13 @@
             deleteButton.innerHTML = "Delete";
             deleteButton.onclick = function() { deleteGroup(groupDiv, ref.child(childKey)); };
             groupDiv.appendChild(deleteButton);
-            var doneButton = document.createElement("button");
-            doneButton.innerHTML = "Done";
-            doneButton.onclick = function() { markGroupAsDone(ref.child(childKey), groupButton); };
-            groupDiv.appendChild(doneButton);
+            // Inside the window.onload function, after creating the deleteButton for each group:
+var doneButton = document.createElement("button");
+doneButton.innerHTML = "Done";
+doneButton.onclick = function() { 
+    markGroupAsDone(ref.child(childKey), groupButton, doneButton); 
+};
+groupDiv.appendChild(doneButton);
 
             var subgroupButton = document.createElement("button");
             subgroupButton.innerHTML = "Add proof";
