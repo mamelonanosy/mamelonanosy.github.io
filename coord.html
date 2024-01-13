@@ -159,7 +159,10 @@ function addGroup(button) {
         deleteButton.onclick = function() { deleteGroup(button.parentNode, ref); };
         button.parentNode.appendChild(deleteButton);
 
-        
+        var doneButton = document.createElement("button");
+        doneButton.innerHTML = "Done";
+        doneButton.onclick = function() { markGroupAsDone(ref, newGroupButton, doneButton); };
+        groupDiv.appendChild(doneButton);
 
         var subgroupButton = document.createElement("button");
         subgroupButton.innerHTML = "Add proof";
