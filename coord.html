@@ -209,15 +209,6 @@ function addGroup(button) {
 
             var groupContainer = document.getElementById("groupContainer");
             groupContainer.appendChild(groupDiv);
-
-            // Prepare for adding a new group
-            var newGroup = document.createElement("div");
-            newGroup.className = "group";
-            var newButton = document.createElement("button");
-            newButton.innerHTML = "Add Group";
-            newButton.onclick = function() { addGroup(newButton); };
-            newGroup.appendChild(newButton);
-            groupContainer.appendChild(newGroup);
         } else {
             alert("This group name already exists. Please enter a different name.");
         }
