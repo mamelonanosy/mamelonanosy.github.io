@@ -244,9 +244,12 @@ function markGroupAsDone(groupRef, button, doneButton) {
 function addSubgroup(ref, group, prefix) {
     var strings = prompt("Please enter the list of strings separated by newlines:");
     if (strings != null) {
-        var stringsArray = strings.split('\n');
+        var stringsArray = strings.split('\n').filter(function(string) {
+            // Filter out empty strings
+            return string.trim() !== '';
+        });
 
-        // Apply the filter only for proof subgroups, not vproof subgroups
+        // Further filtering for 'proof' subgroups
         if (prefix === 'proof') {
             stringsArray = stringsArray.filter(function(string) {
                 return !blockWording(forbiddenPattern, string);
