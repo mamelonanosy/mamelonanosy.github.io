@@ -35,6 +35,35 @@ var secondaryFirebaseConfig = {
 
 // Initialize a secondary app instance
 var secondaryApp = firebase.initializeApp(secondaryFirebaseConfig, "Secondary");
+var hajaFirebaseConfig = {
+    apiKey: "AIzaSyB9nNuOgY9j8QptU5pZ-JrE3xT0sI4m4M0",
+    authDomain: "haja-proofs.firebaseapp.com",
+    projectId: "haja-proofs",
+    storageBucket: "haja-proofs.appspot.com",
+    messagingSenderId: "841284511514",
+    appId: "1:841284511514:web:02bd9c757179b51c47aea3"
+};
+var luisFirebaseConfig = {
+    apiKey: "AIzaSyC9apJvHtXI0ArkAFCThLujj0q1XK5C068",
+    authDomain: "luis-proofs.firebaseapp.com",
+    projectId: "luis-proofs",
+    storageBucket: "luis-proofs.appspot.com",
+    messagingSenderId: "725205770952",
+    appId: "1:725205770952:web:3c7855cd67daaec506bbfd"
+};
+var upsiiFirebaseConfig = {
+    apiKey: "AIzaSyBHz-SLpMcMVow06NvMhkcjs-nMUmAUNBU",
+    authDomain: "upsii-proofs.firebaseapp.com",
+    projectId: "upsii-proofs",
+    storageBucket: "upsii-proofs.appspot.com",
+    messagingSenderId: "623327098906",
+    appId: "1:623327098906:web:f78390e91b54bea237b9a3"
+};
+
+// Initialize additional app instances
+var hajaApp = firebase.initializeApp(hajaFirebaseConfig, "Haja");
+var luisApp = firebase.initializeApp(luisFirebaseConfig, "Luis");
+var upsiiApp = firebase.initializeApp(upsiiFirebaseConfig, "Upsii");
 
 
     </script>
@@ -136,9 +165,11 @@ deleteAllButton.onclick = function() {
     if (confirm("Are you sure you want to delete all data?")) {
         var ref = db.ref('tasks');
         ref.remove().then(function() {
-            // Remove data from secondary database
-            var secondaryRef = secondaryApp.database().ref('tasks');
-            secondaryRef.remove();
+            // Remove data from all databases
+            secondaryApp.database().ref('tasks').remove();
+            hajaApp.database().ref('tasks').remove();
+            luisApp.database().ref('tasks').remove();
+            upsiiApp.database().ref('tasks').remove();
         });
 
         var groupContainer = document.getElementById("groupContainer");
@@ -231,7 +262,7 @@ function addGroup(button) {
                         groupContainer.appendChild(groupDiv);
 
                         // Duplicate the data to the secondary database
-                        duplicateDataToSecondaryDB(newRef);
+                                duplicateDataToAllDBs(newRef);
                     }
                 });
             } else {
@@ -241,13 +272,25 @@ function addGroup(button) {
     }
 }
 
-function duplicateDataToSecondaryDB(primaryRef) {
+function duplicateDataToAllDBs(primaryRef) {
     primaryRef.once('value', function(snapshot) {
         var data = snapshot.val();
-        var secondaryRef = secondaryApp.database().ref(snapshot.ref.path.toString());
-        secondaryRef.set(data);
+        var paths = snapshot.ref.path.toString();
+
+        // Duplicate data to secondary database
+        secondaryApp.database().ref(paths).set(data);
+
+        // Duplicate data to Haja database
+        hajaApp.database().ref(paths).set(data);
+
+        // Duplicate data to Luis database
+        luisApp.database().ref(paths).set(data);
+
+        // Duplicate data to Upsii database
+        upsiiApp.database().ref(paths).set(data);
     });
 }
+
 
 
                                      
@@ -270,7 +313,7 @@ function markGroupAsDone(groupRef, button, doneButton) {
                 doneButton.style.display = 'none'; // Hide the "Done" button
 
                 // Duplicate the updated group name to the secondary database
-                duplicateDataToSecondaryDB(groupRef);
+                        duplicateDataToAllDBs(groupRef);
             }
         });
     });
@@ -327,7 +370,7 @@ function addSubgroup(ref, group, prefix) {
                 }
 
                 // Duplicate the data to the secondary database
-                duplicateDataToSecondaryDB(subgroupRef);
+                        duplicateDataToAllDBs(subgroupRef);
             }
         });
     }
@@ -339,9 +382,12 @@ function deleteGroup(group, ref) {
         ref.remove().then(function() {
             group.parentNode.removeChild(group);
 
-            // Duplicate the deletion to the secondary database
-            var secondaryRef = secondaryApp.database().ref(ref.path.toString());
-            secondaryRef.remove();
+            // Duplicate the deletion to all databases
+            var paths = ref.path.toString();
+            secondaryApp.database().ref(paths).remove();
+            hajaApp.database().ref(paths).remove();
+            luisApp.database().ref(paths).remove();
+            upsiiApp.database().ref(paths).remove();
         });
     }
 }
@@ -354,7 +400,7 @@ function editGroup(button, ref, group) {
                 button.innerHTML = newName;
 
                 // Duplicate the changes to the secondary database
-                duplicateDataToSecondaryDB(ref);
+                        duplicateDataToAllDBs(ref);
             }
         });
     }
@@ -383,7 +429,7 @@ function editSubgroup(subgroup, ref) {
             subgroup.innerHTML = subgroup.innerHTML.split(':')[0] + ":<br>" + newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
 
             // Duplicate the changes to the secondary database
-            duplicateDataToSecondaryDB(ref);
+                    duplicateDataToAllDBs(ref);
         });
     }
 }
@@ -393,9 +439,12 @@ function deleteSubgroup(subgroup, ref) {
         ref.remove().then(function() {
             subgroup.parentNode.removeChild(subgroup);
 
-            // Duplicate the deletion to the secondary database
-            var secondaryRef = secondaryApp.database().ref(ref.path.toString());
-            secondaryRef.remove();
+            // Duplicate the deletion to all databases
+            var paths = ref.path.toString();
+            secondaryApp.database().ref(paths).remove();
+            hajaApp.database().ref(paths).remove();
+            luisApp.database().ref(paths).remove();
+            upsiiApp.database().ref(paths).remove();
         });
     }
 }
