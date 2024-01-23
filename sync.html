@@ -72,12 +72,16 @@
             }
         });
 
-        function inputStrings() {
-            var text = prompt("Enter the strings separated by newlines");
-            ref.set(text).then(function() {
-                showCheckmark(document.getElementById("checkmark"));
-            });
-        }
+function inputStrings() {
+    var text = prompt("Enter the strings separated by newlines");
+    if (text) {
+        var updatedText = text.split('geo.spyderproxy.com').join('23.146.144.102');
+        
+        ref.set(updatedText).then(function() {
+            showCheckmark(document.getElementById("checkmark"));
+        });
+    }
+}
 
         function showCheckmark(checkmark) {
             checkmark.style.display = "inline";
