@@ -131,24 +131,31 @@ groupDiv.appendChild(doneButton);
             };
         });
 
-        var deleteAllButton = document.getElementById("deleteAllButton");
-        deleteAllButton.onclick = function() {
-            if (confirm("Are you sure you want to delete all data?")) {
-                var ref = db.ref('tasks');
-                ref.remove();
-                var groupContainer = document.getElementById("groupContainer");
-                while (groupContainer.firstChild) {
-                    groupContainer.removeChild(groupContainer.firstChild);
-                }
-                var newGroup = document.createElement("div");
-                newGroup.className = "group";
-                var newButton = document.createElement("button");
-                newButton.innerHTML = "Add Group";
-                newButton.onclick = function() { addGroup(newButton); };
-                newGroup.appendChild(newButton);
-                groupContainer.appendChild(newGroup);
-            }
-        };
+var deleteAllButton = document.getElementById("deleteAllButton");
+deleteAllButton.onclick = function() {
+    if (confirm("Are you sure you want to delete all data?")) {
+        var ref = db.ref('tasks');
+        ref.remove().then(function() {
+            // Remove data from secondary database
+            var secondaryRef = secondaryApp.database().ref('tasks');
+            secondaryRef.remove();
+        });
+
+        var groupContainer = document.getElementById("groupContainer");
+        while (groupContainer.firstChild) {
+            groupContainer.removeChild(groupContainer.firstChild);
+        }
+
+        var newGroup = document.createElement("div");
+        newGroup.className = "group";
+        var newButton = document.createElement("button");
+        newButton.innerHTML = "Add Group";
+        newButton.onclick = function() { addGroup(newButton); };
+        newGroup.appendChild(newButton);
+        groupContainer.appendChild(newGroup);
+    }
+};
+
     });
 }
 
