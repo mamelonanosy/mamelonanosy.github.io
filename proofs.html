@@ -16,14 +16,56 @@
     </style>
     <script>
         var firebaseConfig = { 
-  apiKey: "AIzaSyBKtqcRTqmwOn758IA3nOGIRzV7Qk_kG2Q",
-  authDomain: "automation-f208d.firebaseapp.com",
-  databaseURL: "https://automation-f208d-default-rtdb.firebaseio.com",
-  projectId: "automation-f208d",
-  storageBucket: "automation-f208d.appspot.com",
-  messagingSenderId: "861003739122",
-  appId: "1:861003739122:web:0866a42e4bbcc36d54056b" };
+    apiKey: "AIzaSyAwFp-cCY5hE7Se7c4IsnhfoCLHRU4JaDk",
+  authDomain: "ip-start-checker.firebaseapp.com",
+  databaseURL: "https://ip-start-checker-default-rtdb.firebaseio.com",
+  projectId: "ip-start-checker",
+  storageBucket: "ip-start-checker.appspot.com",
+  messagingSenderId: "1086091283794",
+  appId: "1:1086091283794:web:4113ba6106cb7905587e8b" };
         firebase.initializeApp(firebaseConfig);
+var secondaryFirebaseConfig = {
+    apiKey: "AIzaSyC462Nid-H_2n6rRV2gdaAEjb7-37JWFvo",
+    authDomain: "antso-proofs.firebaseapp.com",
+    projectId: "antso-proofs",
+    storageBucket: "antso-proofs.appspot.com",
+    messagingSenderId: "1059719369591",
+    appId: "1:1059719369591:web:fdae1cdcec7fa5f128c772"
+};
+
+// Initialize a secondary app instance
+var secondaryApp = firebase.initializeApp(secondaryFirebaseConfig, "Secondary");
+var hajaFirebaseConfig = {
+    apiKey: "AIzaSyB9nNuOgY9j8QptU5pZ-JrE3xT0sI4m4M0",
+    authDomain: "haja-proofs.firebaseapp.com",
+    projectId: "haja-proofs",
+    storageBucket: "haja-proofs.appspot.com",
+    messagingSenderId: "841284511514",
+    appId: "1:841284511514:web:02bd9c757179b51c47aea3"
+};
+var luisFirebaseConfig = {
+    apiKey: "AIzaSyC9apJvHtXI0ArkAFCThLujj0q1XK5C068",
+    authDomain: "luis-proofs.firebaseapp.com",
+    projectId: "luis-proofs",
+    storageBucket: "luis-proofs.appspot.com",
+    messagingSenderId: "725205770952",
+    appId: "1:725205770952:web:3c7855cd67daaec506bbfd"
+};
+var upsiiFirebaseConfig = {
+    apiKey: "AIzaSyBHz-SLpMcMVow06NvMhkcjs-nMUmAUNBU",
+    authDomain: "upsii-proofs.firebaseapp.com",
+    projectId: "upsii-proofs",
+    storageBucket: "upsii-proofs.appspot.com",
+    messagingSenderId: "623327098906",
+    appId: "1:623327098906:web:f78390e91b54bea237b9a3"
+};
+
+// Initialize additional app instances
+var hajaApp = firebase.initializeApp(hajaFirebaseConfig, "Haja");
+var luisApp = firebase.initializeApp(luisFirebaseConfig, "Luis");
+var upsiiApp = firebase.initializeApp(upsiiFirebaseConfig, "Upsii");
+
+
     </script>
 </head>
 <body>
@@ -118,24 +160,33 @@ groupDiv.appendChild(doneButton);
             };
         });
 
-        var deleteAllButton = document.getElementById("deleteAllButton");
-        deleteAllButton.onclick = function() {
-            if (confirm("Are you sure you want to delete all data?")) {
-                var ref = db.ref('tasks');
-                ref.remove();
-                var groupContainer = document.getElementById("groupContainer");
-                while (groupContainer.firstChild) {
-                    groupContainer.removeChild(groupContainer.firstChild);
-                }
-                var newGroup = document.createElement("div");
-                newGroup.className = "group";
-                var newButton = document.createElement("button");
-                newButton.innerHTML = "Add Group";
-                newButton.onclick = function() { addGroup(newButton); };
-                newGroup.appendChild(newButton);
-                groupContainer.appendChild(newGroup);
-            }
-        };
+var deleteAllButton = document.getElementById("deleteAllButton");
+deleteAllButton.onclick = function() {
+    if (confirm("Are you sure you want to delete all data?")) {
+        var ref = db.ref('tasks');
+        ref.remove().then(function() {
+            // Remove data from all databases
+            secondaryApp.database().ref('tasks').remove();
+            hajaApp.database().ref('tasks').remove();
+            luisApp.database().ref('tasks').remove();
+            upsiiApp.database().ref('tasks').remove();
+        });
+
+        var groupContainer = document.getElementById("groupContainer");
+        while (groupContainer.firstChild) {
+            groupContainer.removeChild(groupContainer.firstChild);
+        }
+
+        var newGroup = document.createElement("div");
+        newGroup.className = "group";
+        var newButton = document.createElement("button");
+        newButton.innerHTML = "Add Group";
+        newButton.onclick = function() { addGroup(newButton); };
+        newGroup.appendChild(newButton);
+        groupContainer.appendChild(newGroup);
+    }
+};
+
     });
 }
 
@@ -155,66 +206,91 @@ function addGroup(button) {
             if (!isDuplicate) {
                 var randomKey = Math.random().toString(36).substr(2, 10);
                 var newRef = db.ref('tasks/' + randomKey);
-                newRef.set({name: groupName});
+                newRef.set({name: groupName}, function(error) {
+                    if (!error) {
+                        var groupDiv = document.createElement("div");
+                        groupDiv.className = "group";
 
-                var groupDiv = document.createElement("div");
-                groupDiv.className = "group";
+                        var newGroupButton = document.createElement("button");
+                        newGroupButton.innerHTML = groupName;
+                        groupDiv.appendChild(newGroupButton);
 
-                var newGroupButton = document.createElement("button");
-                newGroupButton.innerHTML = groupName;
-                groupDiv.appendChild(newGroupButton);
+                        var editButton = document.createElement("button");
+                        editButton.innerHTML = "Edit";
+                        editButton.onclick = function() { editGroup(newGroupButton, newRef, groupDiv); };
+                        groupDiv.appendChild(editButton);
 
-                var editButton = document.createElement("button");
-                editButton.innerHTML = "Edit";
-                editButton.onclick = function() { editGroup(newGroupButton, newRef, groupDiv); };
-                groupDiv.appendChild(editButton);
+                        var deleteButton = document.createElement("button");
+                        deleteButton.innerHTML = "Delete";
+                        deleteButton.onclick = function() { deleteGroup(groupDiv, newRef); };
+                        groupDiv.appendChild(deleteButton);
 
-                var deleteButton = document.createElement("button");
-                deleteButton.innerHTML = "Delete";
-                deleteButton.onclick = function() { deleteGroup(groupDiv, newRef); };
-                groupDiv.appendChild(deleteButton);
+                        var doneButton = document.createElement("button");
+                        doneButton.innerHTML = "Done";
+                        doneButton.onclick = function() { markGroupAsDone(newRef, newGroupButton, doneButton); };
+                        groupDiv.appendChild(doneButton);
 
-                var doneButton = document.createElement("button");
-                doneButton.innerHTML = "Done";
-                doneButton.onclick = function() { markGroupAsDone(newRef, newGroupButton, doneButton); };
-                groupDiv.appendChild(doneButton);
-                            // Initialize a proof counter for this group
-            var groupProofCounter = 0;
-            var subgroupButton = document.createElement("button");
-            subgroupButton.innerHTML = "Add proof";
-            subgroupButton.style.display = "none";
-            subgroupButton.onclick = function() { 
-                groupProofCounter++;
-                addSubgroup(newRef, groupDiv, 'proof_' + groupProofCounter); 
-            };
-            groupDiv.appendChild(subgroupButton);
+                        var groupProofCounter = 0;
+                        var subgroupButton = document.createElement("button");
+                        subgroupButton.innerHTML = "Add proof";
+                        subgroupButton.style.display = "none";
+                        subgroupButton.onclick = function() { 
+                            groupProofCounter++;
+                            addSubgroup(newRef, groupDiv, 'proof_' + groupProofCounter); 
+                        };
+                        groupDiv.appendChild(subgroupButton);
 
-            var vProofButton = document.createElement("button");
-            vProofButton.innerHTML = "Add vproof";
-            vProofButton.style.display = "none"; 
-            vProofButton.onclick = function() { 
-                if (!groupDiv.getElementsByClassName('vproof').length) {
-                    addSubgroup(newRef, groupDiv, 'vproof');
-                } else {
-                    alert('Only one vproof subgroup is allowed per group.');
-                }
-            };
-            groupDiv.appendChild(vProofButton);
+                        var vProofButton = document.createElement("button");
+                        vProofButton.innerHTML = "Add vproof";
+                        vProofButton.style.display = "none"; 
+                        vProofButton.onclick = function() { 
+                            if (!groupDiv.getElementsByClassName('vproof').length) {
+                                addSubgroup(newRef, groupDiv, 'vproof');
+                            } else {
+                                alert('Only one vproof subgroup is allowed per group.');
+                            }
+                        };
+                        groupDiv.appendChild(vProofButton);
 
-            newGroupButton.onclick = function() {
-                var display = subgroupButton.style.display === "none" ? "block" : "none";
-                subgroupButton.style.display = display;
-                vProofButton.style.display = display;
-            };
+                        newGroupButton.onclick = function() {
+                            var display = subgroupButton.style.display === "none" ? "block" : "none";
+                            subgroupButton.style.display = display;
+                            vProofButton.style.display = display;
+                        };
 
-            var groupContainer = document.getElementById("groupContainer");
-            groupContainer.appendChild(groupDiv);
-        } else {
-            alert("This group name already exists. Please enter a different name.");
-        }
+                        var groupContainer = document.getElementById("groupContainer");
+                        groupContainer.appendChild(groupDiv);
+
+                        // Duplicate the data to the secondary database
+                                duplicateDataToAllDBs(newRef);
+                    }
+                });
+            } else {
+                alert("This group name already exists. Please enter a different name.");
+            }
+        });
+    }
+}
+
+function duplicateDataToAllDBs(primaryRef) {
+    primaryRef.once('value', function(snapshot) {
+        var data = snapshot.val();
+        var paths = snapshot.ref.path.toString();
+
+        // Duplicate data to secondary database
+        secondaryApp.database().ref(paths).set(data);
+
+        // Duplicate data to Haja database
+        hajaApp.database().ref(paths).set(data);
+
+        // Duplicate data to Luis database
+        luisApp.database().ref(paths).set(data);
+
+        // Duplicate data to Upsii database
+        upsiiApp.database().ref(paths).set(data);
     });
 }
-}
+
 
 
                                      
@@ -235,12 +311,14 @@ function markGroupAsDone(groupRef, button, doneButton) {
             if (!error) {
                 button.innerHTML = displayGroupName; // Display the name with the icon on the page
                 doneButton.style.display = 'none'; // Hide the "Done" button
+
+                // Duplicate the updated group name to the secondary database
+                        duplicateDataToAllDBs(groupRef);
             }
         });
     });
 }
 
-    
 function addSubgroup(ref, group, prefix) {
     var strings = prompt("Please enter the list of strings separated by newlines:");
     if (strings != null) {
@@ -264,47 +342,75 @@ function addSubgroup(ref, group, prefix) {
         var subgroupCount = group.getElementsByClassName('subgroup').length;
         var subgroupName = prefix === 'proof' ? prefix + '_' + (proofCounter + 1) : prefix;
         var subgroupRef = ref.child(subgroupName);
+        var updates = {};
         stringsArray.forEach(function(string, index) {
-            subgroupRef.child(index.toString()).set(string);
+            updates[index.toString()] = string;
         });
+        subgroupRef.update(updates, function(error) {
+            if (!error) {
+                var subgroupDiv = document.createElement("div");
+                subgroupDiv.className = "subgroup " + prefix;
+                subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+                group.appendChild(subgroupDiv);
 
-        var subgroupDiv = document.createElement("div");
-        subgroupDiv.className = "subgroup " + prefix;
-        subgroupDiv.innerHTML = subgroupName + ":<br>" + stringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
-        group.appendChild(subgroupDiv);
+                // Add delete button for each subgroup
+                var deleteSubgroupButton = document.createElement("button");
+                deleteSubgroupButton.innerHTML = "❌";
+                deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
+                subgroupDiv.appendChild(deleteSubgroupButton);
 
-        // Add delete button for each subgroup
-        var deleteSubgroupButton = document.createElement("button");
-        deleteSubgroupButton.innerHTML = "❌";
-        deleteSubgroupButton.onclick = function() { deleteSubgroup(subgroupDiv, subgroupRef); };
-        subgroupDiv.appendChild(deleteSubgroupButton);
+                // Add edit button for each subgroup
+                var editSubgroupButton = document.createElement("button");
+                editSubgroupButton.innerHTML = "✏️";
+                editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
+                subgroupDiv.appendChild(editSubgroupButton);
 
-        // Add edit button for each subgroup
-        var editSubgroupButton = document.createElement("button");
-        editSubgroupButton.innerHTML = "✏️";
-        editSubgroupButton.onclick = function() { editSubgroup(subgroupDiv, subgroupRef); };
-        subgroupDiv.appendChild(editSubgroupButton);
+                if (prefix === 'proof') {
+                    proofCounter++;
+                }
 
-        if (prefix === 'proof') {
-            proofCounter++;
-        }
+                // Duplicate the data to the secondary database
+                        duplicateDataToAllDBs(subgroupRef);
+            }
+        });
     }
 }
 
 
-    function deleteSubgroup(subgroup, ref) {
-        if (confirm("Are you sure you want to delete this subgroup?")) {
-            ref.remove();
-            subgroup.parentNode.removeChild(subgroup);
-        }
+function deleteGroup(group, ref) {
+    if (confirm("Are you sure you want to delete this group?")) {
+        ref.remove().then(function() {
+            group.parentNode.removeChild(group);
+
+            // Duplicate the deletion to all databases
+            var paths = ref.path.toString();
+            secondaryApp.database().ref(paths).remove();
+            hajaApp.database().ref(paths).remove();
+            luisApp.database().ref(paths).remove();
+            upsiiApp.database().ref(paths).remove();
+        });
     }
+}
+
+function editGroup(button, ref, group) {
+    var newName = prompt("Please enter the new group name:");
+    if (newName != null) {
+        ref.child('name').set(newName, function(error) {
+            if (!error) {
+                button.innerHTML = newName;
+
+                // Duplicate the changes to the secondary database
+                        duplicateDataToAllDBs(ref);
+            }
+        });
+    }
+}
 
 function editSubgroup(subgroup, ref) {
     var newStrings = prompt("Please enter the new list of strings separated by newlines:");
     if (newStrings != null) {
         var newStringsArray = newStrings.split('\n');
 
-        // Apply the filter only for proof subgroups, not vproof subgroups
         if (subgroup.className.indexOf('subgroup proof') !== -1) {
             newStringsArray = newStringsArray.filter(function(string) {
                 return !blockWording(forbiddenPattern, string);
@@ -321,26 +427,27 @@ function editSubgroup(subgroup, ref) {
                 ref.child(index.toString()).set(string);
             });
             subgroup.innerHTML = subgroup.innerHTML.split(':')[0] + ":<br>" + newStringsArray.map((value, index) => `${index}: ${value}`).join('<br>');
+
+            // Duplicate the changes to the secondary database
+                    duplicateDataToAllDBs(ref);
         });
     }
 }
 
-function editGroup(button, ref, group) {
-    var newName = prompt("Please enter the new group name:");
-    if (newName != null) {
-        ref.child('name').set(newName, function(error) {
-            if (!error) {
-                button.innerHTML = newName;
-            }
+function deleteSubgroup(subgroup, ref) {
+    if (confirm("Are you sure you want to delete this subgroup?")) {
+        ref.remove().then(function() {
+            subgroup.parentNode.removeChild(subgroup);
+
+            // Duplicate the deletion to all databases
+            var paths = ref.path.toString();
+            secondaryApp.database().ref(paths).remove();
+            hajaApp.database().ref(paths).remove();
+            luisApp.database().ref(paths).remove();
+            upsiiApp.database().ref(paths).remove();
         });
     }
 }
-    function deleteGroup(group, ref) {
-        if (confirm("Are you sure you want to delete this group?")) {
-            ref.remove();
-            group.parentNode.removeChild(group);
-        }
-    }
 </script>
 <button id="deleteAllButton" style="color: red; text-transform: uppercase;">Delete All</button>
 </body>
