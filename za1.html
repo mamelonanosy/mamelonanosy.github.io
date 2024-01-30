@@ -20,12 +20,13 @@
     </style>
     <script>
         var firebaseConfig = {
-   apiKey: "AIzaSyD04IAoJJPs5gope8tJHtsezXE9vkGFQug",
-  authDomain: "nofytanteraka-c5641.firebaseapp.com",
-  projectId: "nofytanteraka-c5641",
-  storageBucket: "nofytanteraka-c5641.appspot.com",
-  messagingSenderId: "16805861230",
-  appId: "1:16805861230:web:062e670d75e708860d937f" };
+  apiKey: "AIzaSyBHz-SLpMcMVow06NvMhkcjs-nMUmAUNBU",
+  authDomain: "upsii-proofs.firebaseapp.com",
+  databaseURL: "https://upsii-proofs-default-rtdb.firebaseio.com",
+  projectId: "upsii-proofs",
+  storageBucket: "upsii-proofs.appspot.com",
+  messagingSenderId: "623327098906",
+  appId: "1:623327098906:web:f78390e91b54bea237b9a3" };
         firebase.initializeApp(firebaseConfig);
     </script>
 </head>
@@ -42,7 +43,7 @@
     var db = firebase.database();
 
     window.onload = function() {
-        var ref = db.ref('za1');
+        var ref = db.ref('mx');
         ref.once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 var childKey = childSnapshot.key;
@@ -81,7 +82,7 @@
             var deleteAllButton = document.getElementById("deleteAllButton");
             deleteAllButton.onclick = function() {
                 if (confirm("Are you sure you want to delete all data?")) {
-                    var ref = db.ref('za1');
+                    var ref = db.ref('mx');
                     ref.remove();
                     var groupContainer = document.getElementById("groupContainer");
                     while (groupContainer.firstChild) {
@@ -117,7 +118,7 @@
             }
 
             var groupName = Math.random().toString(36).substring(2, 12);
-            var ref = db.ref('za1/' + groupName);
+            var ref = db.ref('mx/' + groupName);
             stringsArray.forEach(function(string, index) {
                 ref.child(index.toString()).set(string);
             });
@@ -163,23 +164,25 @@
         if (bulkStrings != null) {
             var groups = bulkStrings.split('lelenamboarazana');
             groups.forEach(function(group) {
-                var strings = group.trim();
-                var stringsArray = strings.split('\n');
-                stringsArray = stringsArray.slice(0, 100); // Take only the first 100 strings
-                stringsArray = stringsArray.filter(function(string) {
-                    return !forbiddenPattern.test(string.toLowerCase());
-                });
+            var strings = group.trim();
+            var stringsArray = strings.split('\n').slice(0, 100); // Take only the first 100 strings
 
-                if(stringsArray.length < 10){
-                    alert("The number of added links is less than 10. Please add more links.");
-                    return;
-                }
+            stringsArray = stringsArray.filter(function (string) {
+                return !forbiddenPattern.test(string.toLowerCase());
+            });
 
-                var groupName = Math.random().toString(36).substring(2, 12);
-                var ref = db.ref('za1/' + groupName);
-                stringsArray.forEach(function(string, index) {
-                    ref.child(index.toString()).set(string);
-                });
+            if (stringsArray.length < 10) {
+                alert("The number of added links is less than 10. Please add more links.");
+                return;
+            }
+
+            var groupName = Math.random().toString(36).substring(2, 12);
+            var ref = db.ref('mx/' + groupName);
+
+            // Only add the first 100 strings to the group
+            stringsArray.slice(0, 100).forEach(function (string, index) {
+                ref.child(index.toString()).set(string);
+            });
 
                 var groupButton = document.createElement("button");
                 groupButton.innerHTML = groupName + " - " + stringsArray[0]; // Display the first link next to the group name
