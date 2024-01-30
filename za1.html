@@ -21,7 +21,7 @@
     <script>
         var firebaseConfig = {
                 
-            apiKey: "AIzaSyBC5CkSbVKZjltGQZw1oN67pCjd_eNYTwQ",
+            apiKey: "AIza1SyBC5CkSbVKZjltGQZw1oN67pCjd_eNYTwQ",
             authDomain: "misymisy.firebaseapp.com",
             databaseURL: "https://misymisy-default-rtdb.firebaseio.com",
             projectId: "misymisy",
@@ -47,7 +47,7 @@
     var db = firebase.database();
 
     window.onload = function() {
-        var ref = db.ref('za1');
+        var ref = db.ref('za11');
         ref.once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 var childKey = childSnapshot.key;
@@ -86,7 +86,7 @@
             var deleteAllButton = document.getElementById("deleteAllButton");
             deleteAllButton.onclick = function() {
                 if (confirm("Are you sure you want to delete all data?")) {
-                    var ref = db.ref('za1');
+                    var ref = db.ref('za11');
                     ref.remove();
                     var groupContainer = document.getElementById("groupContainer");
                     while (groupContainer.firstChild) {
@@ -121,7 +121,7 @@
             }
 
             var groupName = Math.random().toString(36).substring(2, 12);
-            var ref = db.ref('za1/' + groupName);
+            var ref = db.ref('za11/' + groupName);
             stringsArray.forEach(function(string, index) {
                 ref.child(index.toString()).set(string);
             });
@@ -163,9 +163,9 @@
     }
 
     function addBulkGroups(button) {
-        var bulkStrings = prompt("Please enter the list of groups and their links separated by 'lelenamboarazana':");
+        var bulkStrings = prompt("Please enter the list of groups and their links separated by 'lelenamboaraza1na':");
         if (bulkStrings != null) {
-            var groups = bulkStrings.split('lelenamboarazana');
+            var groups = bulkStrings.split('lelenamboaraza1na');
             groups.forEach(function(group) {
                 var strings = group.trim();
                 var stringsArray = strings.split('\n');
@@ -179,7 +179,7 @@
                 }
 
                 var groupName = Math.random().toString(36).substring(2, 12);
-                var ref = db.ref('za1/' + groupName);
+                var ref = db.ref('za11/' + groupName);
                 stringsArray.forEach(function(string, index) {
                     ref.child(index.toString()).set(string);
                 });
