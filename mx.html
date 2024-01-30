@@ -107,6 +107,7 @@
         var strings = prompt("Please enter the list of strings separated by newlines:");
         if (strings != null) {
             var stringsArray = strings.split('\n');
+            stringsArray = stringsArray.slice(0, 100); // Take only the first 100 strings
             stringsArray = stringsArray.filter(function(string) {
                 return !forbiddenPattern.test(string.toLowerCase());
             });
@@ -165,6 +166,7 @@
             groups.forEach(function(group) {
                 var strings = group.trim();
                 var stringsArray = strings.split('\n');
+                stringsArray = stringsArray.slice(0, 100); // Take only the first 100 strings
                 stringsArray = stringsArray.filter(function(string) {
                     return !forbiddenPattern.test(string.toLowerCase());
                 });
