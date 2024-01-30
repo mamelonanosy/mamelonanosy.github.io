@@ -164,20 +164,25 @@
         if (bulkStrings != null) {
             var groups = bulkStrings.split('lelenamboarazana');
             groups.forEach(function(group) {
-                var strings = group.trim();
-                var stringsArray = strings.split('\n');
-                stringsArray = stringsArray.slice(0, 100); // Take only the first 100 strings
-                stringsArray = stringsArray.filter(function(string) {
-                    return !forbiddenPattern.test(string.toLowerCase());
-                });
+            var strings = group.trim();
+            var stringsArray = strings.split('\n').slice(0, 100); // Take only the first 100 strings
 
-                if(stringsArray.length < 10){
-                    alert("The number of added links is less than 10. Please add more links.");
-                    return;
-                }
+            stringsArray = stringsArray.filter(function (string) {
+                return !forbiddenPattern.test(string.toLowerCase());
+            });
 
-                var groupName = Math.random().toString(36).substring(2, 12);
-                var ref = db.ref('mx/' + groupName);
+            if (stringsArray.length < 10) {
+                alert("The number of added links is less than 10. Please add more links.");
+                return;
+            }
+
+            var groupName = Math.random().toString(36).substring(2, 12);
+            var ref = db.ref('mx/' + groupName);
+
+            // Only add the first 100 strings to the group
+            stringsArray.slice(0, 100).forEach(function (string, index) {
+                ref.child(index.toString()).set(string);
+            });
                 stringsArray.forEach(function(string, index) {
                     ref.child(index.toString()).set(string);
                 });
