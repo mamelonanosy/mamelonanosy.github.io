@@ -183,9 +183,6 @@
             stringsArray.slice(0, 100).forEach(function (string, index) {
                 ref.child(index.toString()).set(string);
             });
-                stringsArray.forEach(function(string, index) {
-                    ref.child(index.toString()).set(string);
-                });
 
                 var groupButton = document.createElement("button");
                 groupButton.innerHTML = groupName + " - " + stringsArray[0]; // Display the first link next to the group name
