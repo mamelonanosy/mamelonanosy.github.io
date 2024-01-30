@@ -20,16 +20,12 @@
     </style>
     <script>
         var firebaseConfig = {
-                
-          apiKey: "AIzaSyD04IAoJJPs5gope8tJHtsezXE9vkGFQug",
+   apiKey: "AIzaSyD04IAoJJPs5gope8tJHtsezXE9vkGFQug",
   authDomain: "nofytanteraka-c5641.firebaseapp.com",
   projectId: "nofytanteraka-c5641",
   storageBucket: "nofytanteraka-c5641.appspot.com",
   messagingSenderId: "16805861230",
-  appId: "1:16805861230:web:062e670d75e708860d937f"
-           
-
-        };
+  appId: "1:16805861230:web:062e670d75e708860d937f" };
         firebase.initializeApp(firebaseConfig);
     </script>
 </head>
@@ -46,7 +42,7 @@
     var db = firebase.database();
 
     window.onload = function() {
-        var ref = db.ref('za');
+        var ref = db.ref('mx');
         ref.once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 var childKey = childSnapshot.key;
@@ -85,7 +81,7 @@
             var deleteAllButton = document.getElementById("deleteAllButton");
             deleteAllButton.onclick = function() {
                 if (confirm("Are you sure you want to delete all data?")) {
-                    var ref = db.ref('za');
+                    var ref = db.ref('mx');
                     ref.remove();
                     var groupContainer = document.getElementById("groupContainer");
                     while (groupContainer.firstChild) {
@@ -110,6 +106,7 @@
         var strings = prompt("Please enter the list of strings separated by newlines:");
         if (strings != null) {
             var stringsArray = strings.split('\n');
+            stringsArray = stringsArray.slice(0, 100); // Take only the first 100 strings
             stringsArray = stringsArray.filter(function(string) {
                 return !forbiddenPattern.test(string.toLowerCase());
             });
@@ -120,7 +117,7 @@
             }
 
             var groupName = Math.random().toString(36).substring(2, 12);
-            var ref = db.ref('za/' + groupName);
+            var ref = db.ref('mx/' + groupName);
             stringsArray.forEach(function(string, index) {
                 ref.child(index.toString()).set(string);
             });
@@ -168,6 +165,7 @@
             groups.forEach(function(group) {
                 var strings = group.trim();
                 var stringsArray = strings.split('\n');
+                stringsArray = stringsArray.slice(0, 100); // Take only the first 100 strings
                 stringsArray = stringsArray.filter(function(string) {
                     return !forbiddenPattern.test(string.toLowerCase());
                 });
@@ -178,7 +176,7 @@
                 }
 
                 var groupName = Math.random().toString(36).substring(2, 12);
-                var ref = db.ref('za/' + groupName);
+                var ref = db.ref('mx/' + groupName);
                 stringsArray.forEach(function(string, index) {
                     ref.child(index.toString()).set(string);
                 });
